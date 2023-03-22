@@ -1,1 +1,1 @@
-#Paper drafts and figures
+Paper drafts and figures
