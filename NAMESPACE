@@ -1,0 +1,3 @@
+exportPattern("^[[:alpha:]]+")
+importFrom(caret, train, predict)
+importFrom(snow, parLapply, makeCluster, clusterExport, stopCluster)
