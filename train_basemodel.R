@@ -2,11 +2,16 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
   
   library(snow)
   library(caret)
-  lM <- length(Method)
+  
+  #Removing NA from Y
+  colnames(X) <- 1:ncol(X)
+  Y.narm <- Y[!is.na(Y)]
+  X.narm <- X[!is.na(Y), ]
+  lY <- length(Y.narm)
   
   #Checking the names and numbers of hyperparameters for each method
+  lM <- length(Method)
   check <- numeric(length = lM)
-  
   for(m in 1:lM){
     if(!setequal(colnames(Method[[m]]), modelLookup(names(Method)[m])$parameter)){
       warning("Hyperparameters of ", names(Method)[[m]], " is incorrect")
@@ -16,6 +21,17 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
   if(any(check>0)){stop("Please confirm the numbers and/or names of hyperparameters of the above methods")}
   
   method <- names(Method)
+  
+  #Determine hyperparameter values when values are not specified
+  for(m in 1:lM){
+    if(any(colSums(is.na(Method[[m]])) == ncol(Method[[m]]))){
+      result_temp <- train(X.narm, Y.narm, method = method[m])
+      for(j in colnames(Method[[m]])){
+        if(sum(is.na(Method[[m]][, j])) == ncol(Method[[m]]))
+          Method[[m]][, j] <- rep(result_temp$bestTune[, j], nrow(Method[[m]]))
+      }
+    }
+  }
   
   #Generating the combinations of hyperparameters
   hyp2give <- as.list(numeric(lM))
@@ -50,16 +66,10 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
     Repeat.parLapply <- 1
   }
   
-  #Removing NA
-  Y.narm <- Y[!is.na(Y)]
-  X.narm <- X[!is.na(Y), ]
-  lY <- length(Y.narm)
-  
   #Dividing data for cross-validation
   ORDER <- sample(1:lY, lY, replace=FALSE)
   Y.randomised <- Y.narm[ORDER]
   X.randomised <- X.narm[ORDER, ]
-  colnames(X.randomised) <- 1:ncol(X.randomised)
   
   if(lY%%Nfold == 0){
     xsoeji <- matrix(1:lY, nrow = lY %/% Nfold, ncol = Nfold)

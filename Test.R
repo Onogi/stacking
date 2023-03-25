@@ -8,8 +8,8 @@ newY<-rowSums(newX[,1:50])+rnorm(N,0,sqrt(0.2*var(rowSums(newX[,1:50]))))
 newY<-as.numeric(scale(newY))
 
 Nfold<-5
-Method<-list(glmnet=data.frame(alpha=c(0,1),lambda=c(1,NA)),
-             pls=data.frame(ncomp=50))
+Method<-list(glmnet=data.frame(alpha=c(0,1),lambda=c(NA,NA)),
+             pls=data.frame(ncomp=NA))
 core<-3
 
 A<-train_basemodel(X, Y, Nfold, Method, core)
