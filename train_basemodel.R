@@ -2,11 +2,15 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
   
   library(snow)
   library(caret)
-  lM <- length(Method)
+  
+  #Removing NA from Y
+  Y.narm <- Y[!is.na(Y)]
+  X.narm <- X[!is.na(Y), ]
+  lY <- length(Y.narm)
   
   #Checking the names and numbers of hyperparameters for each method
+  lM <- length(Method)
   check <- numeric(length = lM)
-  
   for(m in 1:lM){
     if(!setequal(colnames(Method[[m]]), modelLookup(names(Method)[m])$parameter)){
       warning("Hyperparameters of ", names(Method)[[m]], " is incorrect")
@@ -17,9 +21,15 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
   
   method <- names(Method)
   
-  #Specify hyperparameter values when Null is given
+  #Determine hyperparameter values when values are not specified
   for(m in 1:lM){
-      Method[[m]]
+    if(any(colSums(is.na(Method[[m]])) == ncol(Method[[m]]))){
+      result_temp <- train(X.narm, Y.narm, method = method[m])
+      for(j in colnames(Method[[m]]){
+        if(sum(is.na(Method[[m]][, j])) == ncol(Method[[m]]))
+          Method[[m]][, j] <- rep(result_temp$bestTune[, j], nrow(Method[[m]]))
+      }
+    }
   }
   
   #Generating the combinations of hyperparameters
@@ -55,10 +65,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
     Repeat.parLapply <- 1
   }
   
-  #Removing NA
-  Y.narm <- Y[!is.na(Y)]
-  X.narm <- X[!is.na(Y), ]
-  lY <- length(Y.narm)
+
   
   #Dividing data for cross-validation
   ORDER <- sample(1:lY, lY, replace=FALSE)
