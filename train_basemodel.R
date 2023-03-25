@@ -17,6 +17,11 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
   
   method <- names(Method)
   
+  #Specify hyperparameter values when Null is given
+  for(m in 1:lM){
+      Method[[m]]
+  }
+  
   #Generating the combinations of hyperparameters
   hyp2give <- as.list(numeric(lM))
   for(i in 1:lM){
