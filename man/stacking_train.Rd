@@ -67,7 +67,21 @@ Nfold<-10
 Method<-c("glmnet","pls","pcr")
 Metamodel<-c("lm")
 core<-3
+  
+#preparing of hyperparameter (argument "Method")
+#Use a portion of the training data to estimate the hyperparameters to be used in stacking_train
 
+a <- c(1:50)
+hyp_est_glmnet <- train( X[a,], Y[a], method = glmnet)
+hyp_est_hlmnet[[]]
+
+#preparing list of dataframe
+Method <- list( glmnet = dataframe( alpha = c(0 , 0.5, 1 ) ,lambda = c(0 , 0.5 ,10 )
+                 pls = dataframe( ncomp = c(                  
+   
+  
+  
+  
 stacking_train_result <- stacking_train(Y,X,Nfold,Method,Metamodel,core)
 
 #prediction
