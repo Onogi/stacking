@@ -1,6 +1,5 @@
 train_basemodel <- function(X, Y, Nfold, Method, core){
   
-  library(snow)
   library(caret)
   
   #Removing NA from Y
@@ -9,8 +8,19 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
   X.narm <- X[!is.na(Y), ]
   lY <- length(Y.narm)
   
-  #Checking the names and numbers of hyperparameters for each method
+  #Checking the names of methods
   lM <- length(Method)
+  check <- numeric(length = lM)
+  AvailableModel <- names(getModelInfo())
+  for(m in 1:lM){
+    if(!is.element(names(Method)[m], AvailableModel)){
+      warning(names(Method)[[m]], " is not available in caret")
+      check[m] <- 1
+    }
+  }
+  if(any(check>0)){stop("Please confirm the names/spellings of the following methods")}
+  
+  #Checking the names and numbers of hyperparameters for each method
   check <- numeric(length = lM)
   for(m in 1:lM){
     if(!setequal(colnames(Method[[m]]), modelLookup(names(Method)[m])$parameter)){
@@ -18,17 +28,17 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
       check[m] <- 1
     }
   }
-  if(any(check>0)){stop("Please confirm the numbers and/or names of hyperparameters of the above methods")}
+  if(any(check>0)){stop("Please confirm the numbers and/or names of hyperparameters of the following methods")}
   
   method <- names(Method)
   
   #Determine hyperparameter values when values are not specified
   for(m in 1:lM){
-    if(any(colSums(is.na(Method[[m]])) == ncol(Method[[m]]))){
+    if(any(colSums(is.na(Method[[m]])) == nrow(Method[[m]]))){
       result_temp <- train(X.narm, Y.narm, method = method[m])
       for(j in colnames(Method[[m]])){
-        if(sum(is.na(Method[[m]][, j])) == ncol(Method[[m]]))
-          Method[[m]][, j] <- rep(result_temp$bestTune[, j], nrow(Method[[m]]))
+        if(sum(is.na(Method[[m]][, j])) == nrow(Method[[m]]))
+          Method[[m]][, j] <- c(result_temp$bestTune[, j], rep(NA, nrow(Method[[m]]) - 1))
       }
     }
   }
@@ -85,36 +95,24 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
   valpr <- matrix(nrow = lY, ncol = length(L))
   colnames(valpr) <- 1:length(L)
   
-  for(i in 1:Nfold){
-    Test <- xsoeji[, i]
-    X.test <- X.randomised[Test, ]
-    Y.test <- Y.randomised[Test]
-    X.train <- X.randomised[-Test, ]
-    Y.train <- Y.randomised[-Test]
-    
-    cl <- makeCluster(core, type="SOCK")
-    clusterExport(cl, c("X.train",
-                        "Y.train",
-                        "train"), envir = environment())
-
-    train_result[i] <- list(NULL)
-    for(rp in 1:Repeat.parLapply){
-      
-      train_result[[i]]<-c(train_result[[i]],
-                           parLapply(cl, L[Division[, rp]],
-                                   function(m){
-                                     train(X.train, Y.train, method = m$method, tuneGrid = m$hyp)
-                                   })
-      )
-    }
-    stopCluster(cl)
-    
+  for(fold in 1:Nfold){
+    Test <- xsoeji[, fold]
+    train_result[[fold]] <- train_basemodel_core(Repeat.parLapply, 
+                                                 Division, 
+                                                 L, 
+                                                 core,
+                                                 X.randomised,
+                                                 Y.randomised,
+                                                 Test)
+  
     #Creating explanatory variables for the meta model
+    x.test <- X.randomised[Test, ]
     for(k in 1:length(L))
-      valpr[Test, k] <- predict(train_result[[i]][[k]], X.test)
+      valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
+
   }
   colnames(valpr) <- 1:length(L)
-
+  
   #Output training results
   basemodel_train_result <- list(train_result = train_result,
                                  no_base = length(L),
