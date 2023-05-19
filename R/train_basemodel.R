@@ -1,13 +1,20 @@
-train_basemodel <- function(X, Y, Nfold, Method, core){
-  
-  library(caret)
-  
+train_basemodel <- function(X, Y, Nfold, Method, core = 1){
+
+  if(is.factor(Y)) {
+    Type <- "Classification"
+    Y <- as.character(Y)
+  } else {
+    Type <- "Regression"
+    Y <- as.numeric(Y)
+  }
+
   #Removing NA from Y
   colnames(X) <- 1:ncol(X)
   Y.narm <- Y[!is.na(Y)]
   X.narm <- X[!is.na(Y), ]
   lY <- length(Y.narm)
-  
+  if(length(lY) == 0) stop("Elements of Y are all NA.")
+
   #Checking the names of methods
   lM <- length(Method)
   check <- numeric(length = lM)
@@ -19,7 +26,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
     }
   }
   if(any(check>0)){stop("Please confirm the names/spellings of the following methods")}
-  
+
   #Checking the names and numbers of hyperparameters for each method
   check <- numeric(length = lM)
   for(m in 1:lM){
@@ -29,9 +36,9 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
     }
   }
   if(any(check>0)){stop("Please confirm the numbers and/or names of hyperparameters of the following methods")}
-  
+
   method <- names(Method)
-  
+
   #Determine hyperparameter values when values are not specified
   for(m in 1:lM){
     if(any(colSums(is.na(Method[[m]])) == nrow(Method[[m]]))){
@@ -42,7 +49,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
       }
     }
   }
-  
+
   #Generating the combinations of hyperparameters
   hyp2give <- as.list(numeric(lM))
   for(i in 1:lM){
@@ -52,7 +59,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
       hyp2give[[i]] <- hyp2give[[i]][NotUse == 0, ]
     }
   }
-  
+
   #List required for parallel computing
   L <- NULL
   for(i in 1:length(hyp2give)){
@@ -61,7 +68,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
                           method = method[i])))
     }
   }
-  
+
   #When core > length(L)
   if(length(L) > core){
     if(length(L) %% core == 0){
@@ -74,51 +81,59 @@ train_basemodel <- function(X, Y, Nfold, Method, core){
     }
   }else{
     Repeat.parLapply <- 1
+    Division <- matrix(1:length(L), ncol = Repeat.parLapply)
   }
-  
+
   #Dividing data for cross-validation
   ORDER <- sample(1:lY, lY, replace=FALSE)
   Y.randomised <- Y.narm[ORDER]
   X.randomised <- X.narm[ORDER, ]
-  
+
   if(lY%%Nfold == 0){
     xsoeji <- matrix(1:lY, nrow = lY %/% Nfold, ncol = Nfold)
   }else{
     xsoeji <- matrix(0, nrow = lY %/% Nfold + 1, ncol = Nfold)
     xsoeji[1:lY] <- 1:lY
   }
-  
+
   #Training base models
   train_result <- as.list(numeric(Nfold))
   metamodel <- as.list(numeric(1))
-  
+
   valpr <- matrix(nrow = lY, ncol = length(L))
   colnames(valpr) <- 1:length(L)
-  
+
   for(fold in 1:Nfold){
+
+    cat("CV fold", fold, "\n")
     Test <- xsoeji[, fold]
-    train_result[[fold]] <- train_basemodel_core(Repeat.parLapply, 
-                                                 Division, 
-                                                 L, 
+    train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
+                                                 Division,
+                                                 L,
                                                  core,
                                                  X.randomised,
                                                  Y.randomised,
                                                  Test)
-  
+
     #Creating explanatory variables for the meta model
     x.test <- X.randomised[Test, ]
-    for(k in 1:length(L))
-      valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
-
+    if(Type == "Classification"){
+      for(k in 1:length(L))
+        valpr[Test, k] <- as.character(predict(train_result[[fold]][[k]], x.test))
+    } else {
+      for(k in 1:length(L))
+        valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
+    }
   }
   colnames(valpr) <- 1:length(L)
-  
+
   #Output training results
   basemodel_train_result <- list(train_result = train_result,
                                  no_base = length(L),
                                  valpr = valpr,
                                  Y.randomised = Y.randomised,
-                                 Order = ORDER
+                                 Order = ORDER,
+                                 Type = Type
   )
   basemodel_train_result
 }
