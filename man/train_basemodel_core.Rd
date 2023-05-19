@@ -1,6 +1,6 @@
 \name{train_basemodel_core}
 \alias{train_basemodel_core}
-
+\title{Internal function called by train_basemodel}
 \description{Training base models of stacking. This function is called by train_basemodel and designed for the internal use of train_basemodel.
 }
 \usage{
@@ -13,10 +13,10 @@ train_basemodel_core(repeat.parLapply, division, l, core, x, y, exclude)
   \item{core}{Number of cores for parallel processing}
   \item{x}{An N x P matrix of explanatory variables where N is the number of samples and P is the number of variables}
   \item{y}{A length N Vector of objective variables}
-  \item{exclude}{A vector of integers indicating the samples excluded from training as testing data} 
+  \item{exclude}{A vector of integers indicating the samples excluded from training as testing data}
 }
 \details{
-This function is designed for the internal use and not for the users. Thus, detaled usages are not provided.
+This function is designed for the internal use and not for direct use by users. Thus, detaled usages are not provided.
 }
 \value{
 A list containing the training results of base models.

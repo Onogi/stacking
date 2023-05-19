@@ -1,7 +1,8 @@
 \name{train_metamodel}
 \alias{train_metamodel}
-
-\description{Training a meta model of stacking
+\title{Training a meta model based on base models}
+\description{
+Training a meta model of stacking
 }
 \usage{
 train_metamodel(basemodel_train_result, which_to_use, Metamodel)
@@ -12,7 +13,7 @@ train_metamodel(basemodel_train_result, which_to_use, Metamodel)
   \item{Metamodel}{A strings specifying the meta learner}
 }
 \details{
-Stacking by this package consists of the following 2 steps. (1) Nfold cross-validation is conducted with each base learner.(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts step (2). Step (1) is conducted by train_basemodels. Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).
+Stacking by this package consists of the following 2 steps. (1) Nfold cross-validation is conducted with each base learner.(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts step (2). Step (1) is conducted by train_basemodel. Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).
 
 Meta learners can be chosen from the methods implemented in caret. The choosable methods can be seen at https://topepo.github.io/caret/available-models.html or using names(getModelInfo()) after loading caret.
 }
@@ -28,37 +29,61 @@ Taichi Nukui, Akio Onogi
 stacking_train, train_basemodel
 }
 \examples{
-#training
+\donttest{
+#Create a toy example
+##Number of training samples
+N1 <- 100
 
-#column names are required by caret
+##Number of explanatory variables
+P <- 200
 
-N1<- 100 #Number of samples
-P <- 100 #Number of explanatory variables
+##Create X of training data
+X1 <- matrix(rnorm(N1 * P), nrow = N1, ncol = P)
+colnames(X1) <- 1:P#column names are required by caret
 
-#Create X of training data
-X <- matrix(rnorm(N1 * P), nrow = N1, ncol = P)
-colnames(X1) <- 1:P
-#The first 10 variables have effects on Y
-#Add noise by rnorm
-Y <- rowSums(X1[, 1:10]) + rnorm(N1)
+##Assume that the first 10 variables have effects on Y
+##Then add noise with rnorm
+Y1 <- rowSums(X1[, 1:10]) + rnorm(N1)
 
-Y<-Y
-X<-X
-Nfold<-10
-Method<-c("glmnet","pls","pcr")
-Metamodel<-c("lm")
-core<-3
+##Test data
+N2 <- 100
+X2 <- matrix(rnorm(N2 * P), nrow = N2, ncol = P)
+colnames(X2) <- 1:P#Ignored (not required)
+Y2 <- rowSums(X2[, 1:10])
 
-stacking_train_result <- stacking_train(Y,X,Nfold,Method,Metamodel,core)
+#Specify base learners
+Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
+               pls = data.frame(ncomp = 5))
+#=>This specifies four base learners.
+##1. glmnet with alpha = 0 and lambda tuned
+##2. glmnet with alpha = 0.5 and lambda tuned
+##3. glmnet with alpha = 1 and lambda tuned
+##4. pls with ncomp = 5
 
-#prediction
+#Training of base learners
+base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 2)
 
-#Test data
-N2 <- 100 #Number of samples
+#Training of a meta learner
+meta <- train_metamodel(base, which_to_use = 1:4, Metamodel = "lm")
 
-newX <- matrix(rnorm(N2 * P), nrow = N2, ncol = P)
-colnames(newX) <- 1:P
+#Combine both results
+stacking_train_result <- list(base = base, meta = meta)
+#=>this list should have elements named as base and meta
 
-stacking_predict(newX,stacking_train_result)
+#Prediction
+result <- stacking_predict(newX = X2, stacking_train_result)
+plot(Y2, result)
 
+#Training using stacking_train
+stacking_train_result <- stacking_train(X = X1,
+                                        Y = Y1,
+                                        Nfold = 5,
+                                        Method = Method,
+                                        Metamodel = "lm",
+                                        core = 2)
+
+#Prediction
+result <- stacking_predict(newX = X2, stacking_train_result)
+plot(Y2, result)
+}
 }
