@@ -1,7 +1,7 @@
 \name{stacking_train}
 \alias{stacking_train}
 \title{Training base and meta models}
-\description{Training base and meta learners of stacking, an ensemble learning approach. The base and meta learners can be chosen from supervised methods implemented in caret.
+\description{Training base and meta learners of stacking (an ensemble learning approach). The base and meta learners can be chosen from supervised methods implemented in caret.
 }
 \usage{
 stacking_train(X, Y, Nfold, Method, Metamodel, core = 1)
@@ -19,16 +19,16 @@ Stacking by this function consists of the following 2 steps. (1) Nfold cross-val
 
 Base learners are specified by Method. For example,\cr
 Method = list(glmnet = data.frame(alpha = 0, lambda = 5), pls = data.frame(ncomp = 10))\cr
-indicating that the first base learner is glmnet and the second is pls with corresponding hyperparameters.
+indicating that the first base learner is glmnet and the second is pls with the corresponding hyperparameters.
 
 When the data.frames have multiple rows as\cr
-Method = list(glmnet = data.frame(alpha = c(0, 1), lambda = c(5, 10)), pls = data.frame(ncomp = 10))\cr
+Method = list(glmnet = data.frame(alpha = c(0, 1), lambda = c(5, 10)))\cr
 All combinations of hyperparameter values are automatically created as\cr
 [alpha, lambda] = [0, 5], [0, 10], [1, 5], [1, 10]\cr
 Thus, in total 5 base learners (4 glmnet and 1 pls) are created.
 
 When the number of candidate values differ among hyperparameters, use NA as\cr
-Method = list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = c(5, 10, NA)), pls = data.frame(ncomp = 10))\cr
+Method = list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = c(5, 10, NA)))\cr
 resulting in 6 combinations of\cr
 [alpha, lambda] = [0, 5], [0, 10], [0.5, 5], [0.5, 10], [1, 5], [1, 10]
 
@@ -86,11 +86,11 @@ Method <- list(glmnet = data.frame(alpha = c(0.5, 0.8), lambda = c(0.1, 1)),
 
 #Training
 stacking_train_result <- stacking_train(X = X1,
-Y = Y1,
-Nfold = 5,
-Method = Method,
-Metamodel = "lm",
-core = 3)
+                                        Y = Y1,
+                                        Nfold = 5,
+                                        Method = Method,
+                                        Metamodel = "lm",
+                                        core = 3)
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)

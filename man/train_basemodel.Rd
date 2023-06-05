@@ -21,13 +21,13 @@ Method = list(glmnet = data.frame(alpha = 0, lambda = 5), pls = data.frame(ncomp
 indicating that the first base learner is glmnet and the second is pls with corresponding hyperparameters.
 
 When the data.frames have multiple rows as\cr
-Method = list(glmnet = data.frame(alpha = c(0, 1), lambda = c(5, 10)), pls = data.frame(ncomp = 10))\cr
+Method = list(glmnet = data.frame(alpha = c(0, 1), lambda = c(5, 10)))\cr
 All combinations of hyperparameter values are automatically created as\cr
 [alpha, lambda] = [0, 5], [0, 10], [1, 5], [1, 10]\cr
 Thus, in total 5 base learners (4 glmnet and 1 pls) are created.
 
 When the number of candidate values differ among hyperparameters, use NA as\cr
-Method = list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = c(5, 10, NA)), pls = data.frame(ncomp = 10))\cr
+Method = list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = c(5, 10, NA)))\cr
 resulting in 6 combinations of\cr
 [alpha, lambda] = [0, 5], [0, 10], [0.5, 5], [0.5, 10], [1, 5], [1, 10]
 
@@ -80,7 +80,7 @@ Y2 <- rowSums(X2[, 1:10])
 #Specify base learners
 Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
                pls = data.frame(ncomp = 5))
-#=>This specifies four base learners.
+#=>This specifies 4 base learners.
 ##1. glmnet with alpha = 0 and lambda tuned
 ##2. glmnet with alpha = 0.5 and lambda tuned
 ##3. glmnet with alpha = 1 and lambda tuned

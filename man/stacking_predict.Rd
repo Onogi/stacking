@@ -7,11 +7,11 @@
 stacking_predict(newX, stacking_train_result)
 }
 \arguments{
-  \item{newX}{An N x P matrix of explanatory variables for new data where N is the number of samples and P is the number of explanatory variables. Note that the order of explanatory variables should be the same as those for training. Column names of newX are ignored.}
+  \item{newX}{An N x P matrix of explanatory variables of new data where N is the number of samples and P is the number of explanatory variables. Note that the order of explanatory variables should be the same as those for training. Column names of newX are ignored.}
   \item{stacking_train_result}{A list output by stacking_train. When train_basemodel and train_metamodel are directly used, a list combining each output should be created and given as stacking_train_result. See examples for this operation.}
 }
 \details{
-Prediction processes of this package are as follows. First, newX is given to all base models. As a result, each base learner returns Nfold predicted values. Then the predicted values are averaged for each learner. Giving these averaged values as the explanatory variables of the meta model, final predicted values are output.
+Prediction processes of this package are as follows. First, newX is given to all base models. As a result, each base learner returns Nfold predicted values where Nfold is an argument of stacking_train. Then the predicted values are averaged for each learner. Giving these averaged values as the explanatory variables of the meta model, final predicted values are output.
 }
 \value{
 \item{result}{Vector of predicted values}
@@ -44,7 +44,7 @@ Y2 <- rowSums(X2[, 1:10])
 #Specify base learners
 Method <- list(glmnet = data.frame(alpha = c(0.5, 0.8), lambda = c(0.1, 1)),
                pls = data.frame(ncomp = 5))
-#=>This specifies five base learners.
+#=>This specifies 5 base learners.
 ##1. glmnet with alpha = 0.5 and lambda = 0.1
 ##2. glmnet with alpha = 0.5 and lambda = 1
 ##3. glmnet with alpha = 0.8 and lambda = 0.1
