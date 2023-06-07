@@ -1,3 +1,3 @@
 # Stacking
 
-Developing an R package for stacking, an ensemble learning approach.
+An R package for ensemble learning stacking.
