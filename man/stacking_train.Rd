@@ -52,8 +52,8 @@ Taichi Nukui, Akio Onogi
 train_basemodel, train_metamodel
 }
 \examples{
-\donttest{
-#Create a toy example
+#Create another example
+#packages 'glmnet' and 'pls' are required
 ##Number of training samples
 N1 <- 100
 
@@ -75,29 +75,32 @@ colnames(X2) <- 1:P#Ignored (not required)
 Y2 <- rowSums(X2[, 1:10])
 
 #Specify base learners
-Method <- list(glmnet = data.frame(alpha = c(0.5, 0.8), lambda = c(0.1, 1)),
-               pls = data.frame(ncomp = 5))
-#=>This specifies five base learners.
-##1. glmnet with alpha = 0.5 and lambda = 0.1
-##2. glmnet with alpha = 0.5 and lambda = 1
-##3. glmnet with alpha = 0.8 and lambda = 0.1
-##4. glmnet with alpha = 0.8 and lambda = 1
-##5. pls with ncomp = 5
-
+Method <- list(glmnet = data.frame(alpha = c(0.2, 0.5, 0.8), lambda = c(0.1, 1, NA)),
+               pls = data.frame(ncomp = c(2, 5)))
+#=>This specifies 8 base learners.
+##1. glmnet with alpha = 0.2 and lambda = 0.1
+##2. glmnet with alpha = 0.2 and lambda = 1
+##3. glmnet with alpha = 0.5 and lambda = 0.1
+##4. glmnet with alpha = 0.5 and lambda = 1
+##5. glmnet with alpha = 0.8 and lambda = 0.1
+##6. glmnet with alpha = 0.8 and lambda = 1
+##7. pls with ncomp = 2
+##8. pls with ncomp = 5
+\donttest{
 #Training
 stacking_train_result <- stacking_train(X = X1,
                                         Y = Y1,
                                         Nfold = 5,
                                         Method = Method,
                                         Metamodel = "lm",
-                                        core = 3)
+                                        core = 2)
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
 
 #Training using train_basemodel and train_metamodel
-base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 3)
+base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 2)
 meta <- train_metamodel(base, which_to_use = 1:5, Metamodel = "lm")
 stacking_train_result <- list(base = base, meta = meta)
 #=>this list should have elements named as base and meta
@@ -105,7 +108,7 @@ stacking_train_result <- list(base = base, meta = meta)
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
-
+}
 #In the simulations of the reference paper (Nukui and Onogi 2023),
 #we use 48 base learners as
 Method <- list(ranger = data.frame(mtry = c(10, 100, 200),
@@ -156,5 +159,4 @@ Method <- list(ranger = data.frame(mtry = c(10, 100, 500),
 #svmRadial was replaced by svmPoly
 #These base learners may be a good starting point.
 
-}
 }
