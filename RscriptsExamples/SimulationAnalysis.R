@@ -46,9 +46,8 @@ Method <- list(ranger = data.frame(mtry = c(10, 100, 200),
                                 n.trees = c(50, 100, 150),
                                 shrinkage = c(0.1, NA, NA),
                                 n.minobsinnode = c(10, NA, NA)),
-               svmPoly = data.frame(C = c(0.25, 0.5, 1),
-                                    scale = c(0.001, 0.01, 0.1),
-                                    degree = c(1, NA, NA)),
+               svmRadial = data.frame(C = c(0.25, 0.5, 1),
+                                      sigma = c(1e-5, 1e-4, 1e-3)),
                glmnet = data.frame(alpha = c(1, 0.8, 0.6, 0.4, 0.2, 0),
                                    lambda = rep(NA, 6)),
                pls = data.frame(ncomp = seq(2, 70, 10))
@@ -57,7 +56,7 @@ Method <- list(ranger = data.frame(mtry = c(10, 100, 200),
 Metamethod <- "glmnet"
 
 #Methods compared
-Method.compared <- c("glmnet", "ranger", "gbm", "xgbTree", "svmPoly", "pls")
+Method.compared <- c("glmnet", "ranger", "gbm", "xgbTree", "svmRadial", "pls")
 
 #Prediction
 library(stacking)
