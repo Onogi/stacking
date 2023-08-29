@@ -4,7 +4,7 @@
 \description{Training base and meta learners of stacking (an ensemble learning approach). The base and meta learners can be chosen from supervised methods implemented in caret.
 }
 \usage{
-stacking_train(X, Y, Nfold, Method, Metamodel, core = 1)
+stacking_train(X, Y, Nfold, Method, Metamodel, TrainEachFold = FALSE, core = 1)
 }
 \arguments{
   \item{X}{An N x P matrix of explanatory variables where N is the number of samples and P is the number of variables. Column names are required by caret.}
@@ -12,10 +12,13 @@ stacking_train(X, Y, Nfold, Method, Metamodel, core = 1)
   \item{Nfold}{Number of folds for cross-validation. This cross-validation is required for training.}
   \item{Method}{A list specifying base learners. Each element of the list is a data.frame that contains hyperparameter values of base learners. The names of the list elements specifies the base learners and are passed to caret functions. See details and examples}
   \item{Metamodel}{A strings specifying the meta learner. This strings is passed to caret.}
+  \item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold or not. If TRUE, the meta learners learns Nfold times using the values predicted by the base models at each fold. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds.}
   \item{core}{Number of cores for parallel processing}
 }
 \details{
-Stacking by this function consists of the following 2 steps. (1) Nfold cross-validation is conducted with each base learner.(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts steps (1) and (2) at once by calling train_basemodel and train_metamodel, respectively. But users can conduct these steps separately by directly using these functions.
+Stacking by this function consists of the following 2 steps. (1) Nfold cross-validation is conducted with each base learner.(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts steps (1) and (2) at once by calling train_basemodel and train_metamodel, respectively. But users can conduct these steps separately by directly using these functions.\cr
+
+In the step (2), there are two options. One is to train the meta learner Nfold times using the predicted values returned by the base models for each fold. The other is to train the meta learner once pooling the predicted values by the base models across folds. TrainEachModel swiches these options.\cr
 
 Base learners are specified by Method. For example,\cr
 Method = list(glmnet = data.frame(alpha = 0, lambda = 5), pls = data.frame(ncomp = 10))\cr
@@ -52,8 +55,7 @@ Taichi Nukui, Akio Onogi
 train_basemodel, train_metamodel
 }
 \examples{
-#Create another example
-#packages 'glmnet' and 'pls' are required
+#Create a toy example
 ##Number of training samples
 N1 <- 100
 
@@ -75,32 +77,28 @@ colnames(X2) <- 1:P#Ignored (not required)
 Y2 <- rowSums(X2[, 1:10])
 
 #Specify base learners
-Method <- list(glmnet = data.frame(alpha = c(0.2, 0.5, 0.8), lambda = c(0.1, 1, NA)),
-               pls = data.frame(ncomp = c(2, 5)))
-#=>This specifies 8 base learners.
-##1. glmnet with alpha = 0.2 and lambda = 0.1
-##2. glmnet with alpha = 0.2 and lambda = 1
-##3. glmnet with alpha = 0.5 and lambda = 0.1
-##4. glmnet with alpha = 0.5 and lambda = 1
-##5. glmnet with alpha = 0.8 and lambda = 0.1
-##6. glmnet with alpha = 0.8 and lambda = 1
-##7. pls with ncomp = 2
-##8. pls with ncomp = 5
+Method <- list(glmnet = data.frame(alpha = c(0.5, 0.8), lambda = c(0.1, 1)),
+               pls = data.frame(ncomp = 5))
+#=>This specifies five base learners.
+##1. glmnet with alpha = 0.5 and lambda = 0.1
+##2. glmnet with alpha = 0.5 and lambda = 1
+##3. glmnet with alpha = 0.8 and lambda = 0.1
+##4. glmnet with alpha = 0.8 and lambda = 1
+##5. pls with ncomp = 5
 \donttest{
-#Training
 stacking_train_result <- stacking_train(X = X1,
                                         Y = Y1,
                                         Nfold = 5,
                                         Method = Method,
                                         Metamodel = "lm",
-                                        core = 2)
+                                        core = 3)
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
 
 #Training using train_basemodel and train_metamodel
-base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 2)
+base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 3)
 meta <- train_metamodel(base, which_to_use = 1:5, Metamodel = "lm")
 stacking_train_result <- list(base = base, meta = meta)
 #=>this list should have elements named as base and meta
@@ -108,7 +106,7 @@ stacking_train_result <- list(base = base, meta = meta)
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
-}
+
 #In the simulations of the reference paper (Nukui and Onogi 2023),
 #we use 48 base learners as
 Method <- list(ranger = data.frame(mtry = c(10, 100, 200),
@@ -159,4 +157,5 @@ Method <- list(ranger = data.frame(mtry = c(10, 100, 500),
 #svmRadial was replaced by svmPoly
 #These base learners may be a good starting point.
 
+}
 }

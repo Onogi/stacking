@@ -47,6 +47,7 @@ A list containing the following elements is output.
 \item{Y.randomised}{Y ans X are randomized when cross-validation. Randomized Y is output to enable evaluation of prediction accuracy}
 \item{Order}{Order in randomization.}
 \item{Type}{Type of task (regression or classification).}
+\item{Nfold}{Number of cross-validation folds}
 }
 \author{
 Taichi Nukui, Akio Onogi
@@ -55,7 +56,6 @@ Taichi Nukui, Akio Onogi
 stacking_train, train_metamodel
 }
 \examples{
-\donttest{
 #Create a toy example
 ##Number of training samples
 N1 <- 100
@@ -85,7 +85,7 @@ Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
 ##2. glmnet with alpha = 0.5 and lambda tuned
 ##3. glmnet with alpha = 1 and lambda tuned
 ##4. pls with ncomp = 5
-
+\donttest{
 #Training of base learners
 base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 2)
 
