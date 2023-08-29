@@ -1,4 +1,4 @@
-train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel){
+train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, TrainEachFold){
 
   nb <- basemodel_train_result$no_base
 
@@ -23,9 +23,29 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel){
     #Remove added lines
     valpr <- valpr[-c((nrow(valpr) - length(Category) + 1):nrow(valpr)), ]
   }
-  metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = "glmnet")
+
+  if(TrainEachFold){
+    ly <- length(basemodel_train_result$Y.randomised)
+    nfold <- basemodel_train_result$Nfold
+    if(ly%%nfold == 0){
+      xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
+    }else{
+      xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
+      xsoeji[1:ly] <- 1:ly
+    }
+    metamodel <- as.list(numeric(nfold))
+    for(fold in 1:nfold){
+      test <- xsoeji[, fold]
+      metamodel[[fold]] <- train(valpr[test, ],
+                                 basemodel_train_result$Y.randomised[test],
+                                 method = Metamodel)
+    }
+  }else{
+    metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
+  }
 
   metamodel_train_result <- list(train_result = metamodel,
-                                 which_to_use = which_to_use)
+                                 which_to_use = which_to_use,
+                                 TrainEachFold = TrainEachFold)
   metamodel_train_result
 }

@@ -36,7 +36,19 @@ stacking_predict <- function(newX, stacking_train_result){
     mPV <- model.matrix(~., data = mPV)
     #Remove added lines
     mPV <- mPV[-c((nrow(mPV) - length(Category) + 1):nrow(mPV)), ]
-    result <- as.character(predict(mm, mPV))
+    if(stacking_train_result$meta$TrainEachFold){
+      result <- array(0, dim = c(length(mm), lX ,length(Category)),
+                      dimnames = list(1:length(mm), 1:lX, Category))
+      for(fold in 1:length(mm)){
+        predictedCategory <- as.character(predict(mm[[fold]], mPV))
+        for(i in 1:length(predictedCategory)){
+          result[fold, i, predictedCategory[i]] <- 1
+        }
+      }
+      result <- apply(result, 2:3, mean)
+    }else{
+      result <- as.character(predict(mm, mPV))
+    }
   } else {
     #Regression
     PV <- matrix(0, nrow = lX, ncol = lMt)
@@ -46,7 +58,16 @@ stacking_predict <- function(newX, stacking_train_result){
 
     mPV <- PV/Nf
     colnames(mPV) <- 1:lMt
-    result <- as.numeric(predict(mm, mPV[, stacking_train_result$meta$which_to_use, drop = FALSE]))
+
+    if(stacking_train_result$meta$TrainEachFold){
+      result <- 0
+      for(fold in 1:length(mm))
+        result <- result + as.numeric(predict(mm[[fold]],
+                                              mPV[, stacking_train_result$meta$which_to_use, drop = FALSE]))
+      result <- result/length(mm)
+    }else{
+      result <- as.numeric(predict(mm, mPV[, stacking_train_result$meta$which_to_use, drop = FALSE]))
+    }
   }
 
   result

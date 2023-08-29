@@ -6,6 +6,9 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1){
   } else {
     Type <- "Regression"
     Y <- as.numeric(Y)
+    if(sum(is.na(Y)) == length(Y))
+      stop("All elements in Y may be NAs. They may be characters.
+           Use factor when classification")
   }
 
   #Removing NA from Y
@@ -98,7 +101,6 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1){
 
   #Training base models
   train_result <- as.list(numeric(Nfold))
-  metamodel <- as.list(numeric(1))
 
   valpr <- matrix(nrow = lY, ncol = length(L))
   colnames(valpr) <- 1:length(L)
@@ -133,7 +135,8 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1){
                                  valpr = valpr,
                                  Y.randomised = Y.randomised,
                                  Order = ORDER,
-                                 Type = Type
+                                 Type = Type,
+                                 Nfold = Nfold
   )
   basemodel_train_result
 }
