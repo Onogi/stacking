@@ -1,7 +1,7 @@
 Package: stacking
 Type: Package
 Title: Building Predictive Models with Stacking
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(person("Taichi", "Nukui", role = c("aut", "cph"), email = "nukui0430@gmail.com"), person("Akio", "Onogi", role = c("aut", "cre", "cph"), email = "onogiakio@gmail.com"))
 Description: Building predictive models with stacking which is a type of ensemble learning. Learners can be specified from those implemented in 'caret'. For more information of the package, see Nukui and Onogi (2023) <doi:10.1101/2023.06.06.543970>.
 License: MIT + file LICENSE
