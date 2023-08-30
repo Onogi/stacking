@@ -5,7 +5,7 @@
 Training a meta model of stacking
 }
 \usage{
-train_metamodel(basemodel_train_result, which_to_use, Metamodel, TrainEachFold)
+train_metamodel(basemodel_train_result, which_to_use, Metamodel, TrainEachFold = FALSE)
 }
 \arguments{
   \item{basemodel_train_result}{The list output by train_basemodel}
