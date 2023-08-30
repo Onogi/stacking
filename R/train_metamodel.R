@@ -1,4 +1,4 @@
-train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, TrainEachFold){
+train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, TrainEachFold = FALSE){
 
   nb <- basemodel_train_result$no_base
 
