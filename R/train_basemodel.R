@@ -184,8 +184,8 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
   basemodel_train_result <- list(train_result = train_result,
                                  no_base = length(L),
                                  valpr = valpr,
-                                 Y.randomised = Y.randomised,
-                                 Order = ORDER,
+                                 Y.randomised = if (cross_validation) Y.randomised else Y_train,
+                                 Order = if (cross_validation) ORDER else num_train_instances,
                                  Type = Type,
                                  Nfold = Nfold
   )
