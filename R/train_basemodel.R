@@ -1,4 +1,4 @@
-train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TRUE, number = NULL){
+train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross-validation = TRUE, number = NULL){
   
   if(is.factor(Y)) {
     Type <- "Classification"
@@ -87,7 +87,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
     Division <- matrix(1:length(L), ncol = Repeat.parLapply)
   }
   
-  if(cross_validation){
+  if(cross-validation){
     
     #Dividing data for cross-validation
     ORDER <- sample(1:lY, lY, replace=FALSE)
@@ -149,21 +149,21 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
       cat("CV fold", fold, "\n")
       
       # Randomly select training instances
-      train_indices <- sample(1:lY, num_train_instances, replace = FALSE)
+      ORDER <- sample(1:lY, num_train_instances, replace = FALSE)
       
       # Use the rest of the instances as test set
-      Test <- setdiff(1:lY, train_indices)
+      Test <- setdiff(1:lY, ORDER)
       
-      X_train <- X.narm[train_indices, ]
-      Y_train <- Y.narm[train_indices]
+      Y.randomised <- Y.narm[ORDER]
+      X.randomised <- X.narm[ORDER, ]
       
       # Train the base models
       train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
                                                    Division,
                                                    L,
                                                    core,
-                                                   X_train,
-                                                   Y_train,
+                                                   X.randomised,
+                                                   Y.randomised,
                                                    Test)
       
       #Creating explanatory variables for the meta model
@@ -184,8 +184,8 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
   basemodel_train_result <- list(train_result = train_result,
                                  no_base = length(L),
                                  valpr = valpr,
-                                 Y.randomised = if (cross_validation) Y.randomised else Y_train,
-                                 Order = if (cross_validation) ORDER else num_train_instances,
+                                 Y.randomised = Y.randomised,
+                                 Order = ORDER,
                                  Type = Type,
                                  Nfold = Nfold
   )
