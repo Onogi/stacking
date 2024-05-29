@@ -1,4 +1,4 @@
-train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross-validation = TRUE, number = NULL){
+train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TRUE, number = NULL){
   
   if(is.factor(Y)) {
     Type <- "Classification"
@@ -87,7 +87,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross-validation = TR
     Division <- matrix(1:length(L), ncol = Repeat.parLapply)
   }
   
-  if(cross-validation){
+  if(cross_validation){
     
     #Dividing data for cross-validation
     ORDER <- sample(1:lY, lY, replace=FALSE)
