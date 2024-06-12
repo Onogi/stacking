@@ -132,8 +132,9 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
   }else{
     
     # Training base models(Random select)
-    if(is.null(number) || number <= 0 || number > lY){
-      stop("number must be a positive integer less than or equal to the length of Y.narm")
+    # Training base models(Random select)
+    if(is.null(number) || number <= 0 || number > 1){
+      stop("number must be a positive integer or a fraction between 0 and 1")
     }
     
     train_result <- as.list(numeric(Nfold))
@@ -141,15 +142,12 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
     valpr <- matrix(nrow = lY, ncol = length(L))
     colnames(valpr) <- 1:length(L)
     
-    # Randomly select the number of training instances 
-    num_train_instances <- sample(lY, number)
-    
     for(fold in 1:Nfold){
       
       cat("CV fold", fold, "\n")
       
       # Randomly select training instances
-      ORDER <- sample(1:lY, num_train_instances, replace = FALSE)
+      ORDER <- sample_frac(tbl = 1:lY, size = number, replace = FALSE)
       
       # Use the rest of the instances as test set
       Test <- setdiff(1:lY, ORDER)
