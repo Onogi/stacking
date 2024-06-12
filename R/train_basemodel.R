@@ -138,6 +138,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
     }
     
     train_result <- as.list(numeric(Nfold))
+    Training_X_list <- as.list(numeric(Nfold))
     
     valpr <- matrix(nrow = lY, ncol = length(L))
     colnames(valpr) <- 1:length(L)
@@ -154,6 +155,9 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
       
       Y.randomised <- Y.narm[ORDER]
       X.randomised <- X.narm[ORDER, ]
+
+      # Save X.randomised in a list
+      Training_X_list[[fold]] <- X.randomised
       
       # Train the base models
       train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
