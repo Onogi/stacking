@@ -1,4 +1,4 @@
-train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TRUE, number = NULL){
+train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, number = NULL){
   
   if(is.factor(Y)) {
     Type <- "Classification"
@@ -89,6 +89,55 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
   
   if(cross_validation){
     
+    # Training base models(Random select)
+    if(is.null(number) || number <= 0 || number > 1){
+      stop("number must be a positive integer or a fraction between 0 and 1")
+    }
+    
+    train_result <- as.list(numeric(Nfold))
+    Training_X_list <- as.list(numeric(Nfold))
+    
+    valpr <- matrix(nrow = lY, ncol = length(L))
+    colnames(valpr) <- 1:length(L)
+    
+    for(fold in 1:Nfold){
+      
+      cat("CV fold", fold, "\n")
+      
+      # Randomly select training instances
+      ORDER <- sample_frac(tbl = 1:lY, size = number, replace = FALSE)
+      
+      # Use the rest of the instances as test set
+      Test <- setdiff(1:lY, ORDER)
+      
+      Y.randomised <- Y.narm[ORDER]
+      X.randomised <- X.narm[ORDER, ]
+      
+      # Save X.randomised in a list
+      Training_X_list[[fold]] <- X.randomised
+      
+      # Train the base models
+      train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
+                                                   Division,
+                                                   L,
+                                                   core,
+                                                   X.randomised,
+                                                   Y.randomised,
+                                                   Test)
+      
+      #Creating explanatory variables for the meta model
+      x.test <- X.narm[Test, ]
+      if(Type == "Classification"){
+        for(k in 1:length(L))
+          valpr[Test, k] <- as.character(predict(train_result[[fold]][[k]], x.test))
+      } else {
+        for(k in 1:length(L))
+          valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
+      }
+    }
+    
+  }else{
+    
     #Dividing data for cross-validation
     ORDER <- sample(1:lY, lY, replace=FALSE)
     Y.randomised <- Y.narm[ORDER]
@@ -129,67 +178,19 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = TR
           valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
       }
     }
-  }else{
     
-    # Training base models(Random select)
-    # Training base models(Random select)
-    if(is.null(number) || number <= 0 || number > 1){
-      stop("number must be a positive integer or a fraction between 0 and 1")
-    }
     
-    train_result <- as.list(numeric(Nfold))
-    Training_X_list <- as.list(numeric(Nfold))
-    
-    valpr <- matrix(nrow = lY, ncol = length(L))
     colnames(valpr) <- 1:length(L)
     
-    for(fold in 1:Nfold){
-      
-      cat("CV fold", fold, "\n")
-      
-      # Randomly select training instances
-      ORDER <- sample_frac(tbl = 1:lY, size = number, replace = FALSE)
-      
-      # Use the rest of the instances as test set
-      Test <- setdiff(1:lY, ORDER)
-      
-      Y.randomised <- Y.narm[ORDER]
-      X.randomised <- X.narm[ORDER, ]
-
-      # Save X.randomised in a list
-      Training_X_list[[fold]] <- X.randomised
-      
-      # Train the base models
-      train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
-                                                   Division,
-                                                   L,
-                                                   core,
-                                                   X.randomised,
-                                                   Y.randomised,
-                                                   Test)
-      
-      #Creating explanatory variables for the meta model
-      x.test <- X.narm[Test, ]
-      if(Type == "Classification"){
-        for(k in 1:length(L))
-          valpr[Test, k] <- as.character(predict(train_result[[fold]][[k]], x.test))
-      } else {
-        for(k in 1:length(L))
-          valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
-      }
-    }
+    #Output training results
+    basemodel_train_result <- list(train_result = train_result,
+                                   no_base = length(L),
+                                   valpr = valpr,
+                                   Y.randomised = Y.randomised,
+                                   Order = ORDER,
+                                   Type = Type,
+                                   Nfold = Nfold,
+                                   Training_X_list = Training_X_list
+    )
+    basemodel_train_result
   }
-  
-  colnames(valpr) <- 1:length(L)
-  
-  #Output training results
-  basemodel_train_result <- list(train_result = train_result,
-                                 no_base = length(L),
-                                 valpr = valpr,
-                                 Y.randomised = Y.randomised,
-                                 Order = ORDER,
-                                 Type = Type,
-                                 Nfold = Nfold
-  )
-  basemodel_train_result
-}
