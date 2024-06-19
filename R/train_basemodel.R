@@ -148,7 +148,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       cat("CV fold", fold, "\n")
       
       # Randomly select training instances
-      ORDER <- sample_frac(tbl = 1:lY, size = number, replace = FALSE)
+      ORDER <- unlist(sample_frac(tbl = data.frame(1:lY), size = number, replace = FALSE))
       
       # Use the rest of the instances as test set
       Test <- setdiff(1:lY, ORDER)
