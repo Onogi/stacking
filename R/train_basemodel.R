@@ -89,6 +89,49 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
   
   if(cross_validation){
     
+    #Dividing data for cross-validation
+    ORDER <- sample(1:lY, lY, replace=FALSE)
+    Y.randomised <- Y.narm[ORDER]
+    X.randomised <- X.narm[ORDER, ]
+    
+    if(lY%%Nfold == 0){
+      xsoeji <- matrix(1:lY, nrow = lY %/% Nfold, ncol = Nfold)
+    }else{
+      xsoeji <- matrix(0, nrow = lY %/% Nfold + 1, ncol = Nfold)
+      xsoeji[1:lY] <- 1:lY
+    }
+    
+    #Training base models
+    train_result <- as.list(numeric(Nfold))
+    
+    valpr <- matrix(nrow = lY, ncol = length(L))
+    colnames(valpr) <- 1:length(L)
+    
+    for(fold in 1:Nfold){
+      
+      cat("CV fold", fold, "\n")
+      Test <- xsoeji[, fold]
+      train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
+                                                   Division,
+                                                   L,
+                                                   core,
+                                                   X.randomised,
+                                                   Y.randomised,
+                                                   Test)
+      
+      #Creating explanatory variables for the meta model
+      x.test <- X.randomised[Test, ]
+      if(Type == "Classification"){
+        for(k in 1:length(L))
+          valpr[Test, k] <- as.character(predict(train_result[[fold]][[k]], x.test))
+      } else {
+        for(k in 1:length(L))
+          valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
+      }
+    }
+    
+  }else{
+    
     # Training base models(Random select)
     if(is.null(number) || number <= 0 || number > 1){
       stop("number must be a positive integer or a fraction between 0 and 1")
@@ -135,50 +178,6 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
           valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
       }
     }
-    
-  }else{
-    
-    #Dividing data for cross-validation
-    ORDER <- sample(1:lY, lY, replace=FALSE)
-    Y.randomised <- Y.narm[ORDER]
-    X.randomised <- X.narm[ORDER, ]
-    
-    if(lY%%Nfold == 0){
-      xsoeji <- matrix(1:lY, nrow = lY %/% Nfold, ncol = Nfold)
-    }else{
-      xsoeji <- matrix(0, nrow = lY %/% Nfold + 1, ncol = Nfold)
-      xsoeji[1:lY] <- 1:lY
-    }
-    
-    #Training base models
-    train_result <- as.list(numeric(Nfold))
-    
-    valpr <- matrix(nrow = lY, ncol = length(L))
-    colnames(valpr) <- 1:length(L)
-    
-    for(fold in 1:Nfold){
-      
-      cat("CV fold", fold, "\n")
-      Test <- xsoeji[, fold]
-      train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
-                                                   Division,
-                                                   L,
-                                                   core,
-                                                   X.randomised,
-                                                   Y.randomised,
-                                                   Test)
-      
-      #Creating explanatory variables for the meta model
-      x.test <- X.randomised[Test, ]
-      if(Type == "Classification"){
-        for(k in 1:length(L))
-          valpr[Test, k] <- as.character(predict(train_result[[fold]][[k]], x.test))
-      } else {
-        for(k in 1:length(L))
-          valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
-      }
-    }
-    
     
     colnames(valpr) <- 1:length(L)
     
