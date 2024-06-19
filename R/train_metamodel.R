@@ -37,19 +37,17 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
       metamodel <- as.list(numeric(nfold))
       for(fold in 1:nfold){
         test <- xsoeji[, fold]
-        #Combine the test portion of valpr and the corresponding part of X.randomised vertically
-        combined_data <- cbind(valpr[test, ], Training_X_list[[fold]])
-        metamodel[[fold]] <- train(combined_data,
+        metamodel[[fold]] <- train(valpr[test, ],
                                    basemodel_train_result$Y.randomised[test],
                                    method = Metamodel)
       }
     } else {
-      #Combine all of valpr and the saved X.randomised vertically
-      combined_X_randomised <- do.call(cbind, Training_X_list)
-      combined_data <- cbind(valpr, combined_X_randomised)
-      metamodel <- train(combined_data, basemodel_train_result$Y.randomised, method = Metamodel)
+      metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
     }
+    
   } else {
+    
+    #randomselect
     if(TrainEachFold){
       ly <- length(basemodel_train_result$Y.randomised)
       nfold <- basemodel_train_result$Nfold
@@ -62,17 +60,22 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
       metamodel <- as.list(numeric(nfold))
       for(fold in 1:nfold){
         test <- xsoeji[, fold]
-        metamodel[[fold]] <- train(valpr[test, ],
+        #Combine the test portion of valpr and the corresponding part of X.randomised vertically
+        combined_data <- rbind(valpr[test, ], Training_X_list[[fold]])
+        metamodel[[fold]] <- train(combined_data,
                                    basemodel_train_result$Y.randomised[test],
                                    method = Metamodel)
       }
     } else {
-      metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
+      #Combine all of valpr and the saved X.randomised vertically
+      combined_X_randomised <- do.call(rbind, Training_X_list)
+      combined_data <- rbind(valpr, combined_X_randomised)
+      metamodel <- train(combined_data, basemodel_train_result$Y.randomised, method = Metamodel)
     }
+    
+    metamodel_train_result <- list(train_result = metamodel,
+                                   which_to_use = which_to_use,
+                                   TrainEachFold = TrainEachFold)
+    metamodel_train_result
   }
   
-  metamodel_train_result <- list(train_result = metamodel,
-                                 which_to_use = which_to_use,
-                                 TrainEachFold = TrainEachFold)
-  metamodel_train_result
-}
