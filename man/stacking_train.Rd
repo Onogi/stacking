@@ -1,7 +1,7 @@
 \name{stacking_train}
 \alias{stacking_train}
 \title{Training base and meta models}
-\description{Training base and meta learners of stacking (an ensemble learning approach). The base and meta learners can be chosen from supervised methods implemented in caret.
+\description{Training base and meta learners of stacking (an ensemble learning approach). The base and meta learners can be chosen from supervised methods implemented in caret. This function internally calls train_basemodel and train_metamodel.
 }
 \usage{
 stacking_train(X, Y, Nfold, Method, Metamodel, TrainEachFold = FALSE, core = 1)
