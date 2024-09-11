@@ -9,4 +9,4 @@ NeedsCompilation: no
 Packaged: 2023-06-09 03:08:15 UTC; lbds2
 Author: Taichi Nukui [aut, cph], Akio Onogi [aut, cre, cph]
 Maintainer: Akio Onogi <onogiakio@gmail.com>
-Depends: caret, parallel, snow
+Depends: caret, parallel
