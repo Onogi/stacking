@@ -1,4 +1,7 @@
 train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, number = NULL){
+
+  #=>引数numberはproportionなどがよい
+  #=>numberには初期値を与えておく（0.8あたり）
   
   if(is.factor(Y)) {
     Type <- "Classification"
@@ -136,19 +139,25 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     if(is.null(number) || number <= 0 || number > 1){
       stop("number must be a positive integer or a fraction between 0 and 1")
     }
+    #=>警告文を修正"numeric must be a real number greater than 0 and less than or equal to 1."
     
     train_result <- as.list(numeric(Nfold))
     Training_X_list <- as.list(numeric(Nfold))
     
     valpr <- matrix(nrow = lY, ncol = length(L))
     colnames(valpr) <- 1:length(L)
+    #=>valprはメタモデルの説明変数になる予測値です。ランダムサンプルでは行数はlYではないです。(1 - number) * lY * Nfoldでは
     
     for(fold in 1:Nfold){
+      #=>ランダムサンプリングをNfold繰り返す、という意味になる。ややこしくはないだろうか？
+      #=>ランダムサンプリングの繰り返し数を決める引数を新たに作ったほうがよいと思う
       
       cat("CV fold", fold, "\n")
       
       # Randomly select training instances
       ORDER <- unlist(sample_frac(tbl = data.frame(1:lY), size = number, replace = FALSE))
+      #=>sample_fracを使うためには、パッケージのインストールが必要ではないか？（Momocs?）
+      #=>外部パッケージへの依存が少ない方が維持は楽。別のやり方でサンプリングできないか？
       
       # Use the rest of the instances as test set
       Test <- setdiff(1:lY, ORDER)
@@ -177,6 +186,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
         for(k in 1:length(L))
           valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
       }
+      #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
     }
     
     colnames(valpr) <- 1:length(L)
@@ -192,5 +202,6 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
                                    Training_X_list = Training_X_list
     )
     basemodel_train_result
+    #=>basemodel_train_resultが、cross_validation=TRUEのときにも出力されるようにしないといけません。現状そうなっていません。
   }
   }
