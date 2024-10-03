@@ -182,9 +182,9 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       start_row <- (iteration - 1) * (1 - proportion) * lY + 1
       end_row <- iteration * (1 - proportion) * lY
       if(Type == "Classification"){
-    valpr[Test, ] <- as.character(predict(train_result[[iteration]], x.test))
+    valpr[start_row:end_row, ] <- as.character(predict(train_result[[iteration]], x.test))
 } else {
-    valpr[Test, ] <- predict(train_result[[iteration]], x.test)
+    valpr[start_row:end_row, ] <- predict(train_result[[iteration]], x.test)
       #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
     }
     
