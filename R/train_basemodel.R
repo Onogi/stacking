@@ -1,4 +1,4 @@
-train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, number = NULL){
+train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, num_sample, proportion = 0.8){
 
   #=>引数numberはproportionなどがよい
   #=>numberには初期値を与えておく（0.8あたり）
@@ -136,26 +136,26 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
   }else{
     
     # Training base models(Random select)
-    if(is.null(number) || number <= 0 || number > 1){
-      stop("number must be a positive integer or a fraction between 0 and 1")
+    if(is.null(proportion) || proportion <= 0 || proportion > 1){
+      stop("proportion must be a real number greater than 0 and less than or equal to 1.")
     }
     #=>警告文を修正"numeric must be a real number greater than 0 and less than or equal to 1."
     
-    train_result <- as.list(numeric(Nfold))
-    Training_X_list <- as.list(numeric(Nfold))
+    train_result <- as.list(numeric(num_sample))
+    Training_X_list <- as.list(numeric(num_sample))
     
-    valpr <- matrix(nrow = lY, ncol = length(L))
+    valpr <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = length(L))
     colnames(valpr) <- 1:length(L)
     #=>valprはメタモデルの説明変数になる予測値です。ランダムサンプルでは行数はlYではないです。(1 - number) * lY * Nfoldでは
     
-    for(fold in 1:Nfold){
+    for(iteration in 1:num_sample){
       #=>ランダムサンプリングをNfold繰り返す、という意味になる。ややこしくはないだろうか？
       #=>ランダムサンプリングの繰り返し数を決める引数を新たに作ったほうがよいと思う
       
-      cat("CV fold", fold, "\n")
+      cat("CV iteration", iteration, "\n")
       
       # Randomly select training instances
-      ORDER <- unlist(sample_frac(tbl = data.frame(1:lY), size = number, replace = FALSE))
+      ORDER <- sample(1:lY, size = round(proportion * lY), replace = FALSE)
       #=>sample_fracを使うためには、パッケージのインストールが必要ではないか？（Momocs?）
       #=>外部パッケージへの依存が少ない方が維持は楽。別のやり方でサンプリングできないか？
       
@@ -166,10 +166,10 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       X.randomised <- X.narm[ORDER, ]
       
       # Save X.randomised in a list
-      Training_X_list[[fold]] <- X.randomised
+      Training_X_list[[iteration]] <- X.randomised
       
       # Train the base models
-      train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
+      train_result[[iteration]] <- train_basemodel_core(Repeat.parLapply,
                                                    Division,
                                                    L,
                                                    core,
@@ -180,12 +180,15 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       #Creating explanatory variables for the meta model
       x.test <- X.narm[Test, ]
       if(Type == "Classification"){
-        for(k in 1:length(L))
-          valpr[Test, k] <- as.character(predict(train_result[[fold]][[k]], x.test))
-      } else {
-        for(k in 1:length(L))
-          valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
-      }
+        for(k in 1:length(L)){
+    predictions <- predict(train_result[[iteration]][[k]], x.test)
+    valpr[Test, k] <- as.character(predictions)  
+  }
+} else {
+  for(k in 1:length(L)){
+    predictions <- predict(train_result[[iteration]][[k]], x.test)
+    valpr[Test, k] <- predictions  
+  }
       #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
     }
     
