@@ -180,15 +180,9 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       #Creating explanatory variables for the meta model
       x.test <- X.narm[Test, ]
       if(Type == "Classification"){
-        for(k in 1:length(L)){
-    predictions <- predict(train_result[[iteration]][[k]], x.test)
-    valpr[Test, k] <- as.character(predictions)  
-  }
+    valpr[Test, ] <- as.character(predict(train_result[[iteration]], x.test))
 } else {
-  for(k in 1:length(L)){
-    predictions <- predict(train_result[[iteration]][[k]], x.test)
-    valpr[Test, k] <- predictions  
-  }
+    valpr[Test, ] <- predict(train_result[[iteration]], x.test)
       #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
     }
     
