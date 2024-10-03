@@ -179,6 +179,8 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       
       #Creating explanatory variables for the meta model
       x.test <- X.narm[Test, ]
+      start_row <- (iteration - 1) * (1 - proportion) * lY + 1
+      end_row <- iteration * (1 - proportion) * lY
       if(Type == "Classification"){
     valpr[Test, ] <- as.character(predict(train_result[[iteration]], x.test))
 } else {
