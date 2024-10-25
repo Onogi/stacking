@@ -210,7 +210,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
                                      Y.randomised = Y.randomised,
                                      Order = ORDER,
                                      Type = Type,
-                                     Nfold = Nfold,
+                                     num_sample = num_sample,
                                      Training_X_list = Training_X_list
       )
       #=>basemodel_train_resultが、cross_validation=TRUEのときにも出力されるようにしないといけません。現状そうなっていません。
