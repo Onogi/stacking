@@ -1,4 +1,4 @@
-train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE){
+train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE, use_X = FALSE){
 
   #=>basemodel_train_result（train_basemodelの出力）の要素にTraining_X_listが含まれているので、引数にはいらないのでは？
   #=>またcross_validationを、basemodel_train_resultの要素とすると、引数に入れる必要はなくなります。
@@ -27,18 +27,41 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     valpr <- valpr[-c((nrow(valpr) - length(Category) + 1):nrow(valpr)), ]
   }
   
-  if(cross_validation){
-    if(TrainEachFold){
+if (cross_validation) {
+  if (use_X) {  
+    if (TrainEachFold) {
       ly <- length(basemodel_train_result$Y.randomised)
       nfold <- basemodel_train_result$Nfold
-      if(ly %% nfold == 0){
+      if (ly %% nfold == 0) {
         xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
       } else {
         xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
         xsoeji[1:ly] <- 1:ly
       }
       metamodel <- as.list(numeric(nfold))
-      for(fold in 1:nfold){
+      for (fold in 1:nfold) {
+        test <- xsoeji[, fold]
+        x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X_list[test, ])
+        metamodel[[fold]] <- train(x_data,
+                                   basemodel_train_result$Y.randomised[test],
+                                   method = Metamodel)
+      }
+    } else {
+      x_data <- cbind(valpr, basemodel_train_result$Training_X_list)
+      metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
+    }
+  } else {
+    if (TrainEachFold) {
+      ly <- length(basemodel_train_result$Y.randomised)
+      nfold <- basemodel_train_result$Nfold
+      if (ly %% nfold == 0) {
+        xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
+      } else {
+        xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
+        xsoeji[1:ly] <- 1:ly
+      }
+      metamodel <- as.list(numeric(nfold))
+      for (fold in 1:nfold) {
         test <- xsoeji[, fold]
         metamodel[[fold]] <- train(valpr[test, ],
                                    basemodel_train_result$Y.randomised[test],
@@ -47,6 +70,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     } else {
       metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
     }
+  }
+}
     
   } else {
     
