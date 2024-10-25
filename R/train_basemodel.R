@@ -141,7 +141,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
         Order = ORDER,
         Type = Type,
         Nfold = Nfold,
-        Training_X_list = NULL
+        Training_X_list = X
       )
       
     }
