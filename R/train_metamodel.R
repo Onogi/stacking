@@ -1,4 +1,4 @@
-train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE, Training_X_list = NULL){
+train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE){
 
   #=>basemodel_train_result（train_basemodelの出力）の要素にTraining_X_listが含まれているので、引数にはいらないのでは？
   #=>またcross_validationを、basemodel_train_resultの要素とすると、引数に入れる必要はなくなります。
