@@ -1,5 +1,5 @@
 train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, num_sample, proportion = 0.8){
-
+  
   #=>引数numberはproportionなどがよい
   #=>numberには初期値を与えておく（0.8あたり）
   
@@ -131,6 +131,19 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
         for(k in 1:length(L))
           valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
       }
+      
+      #Output training results
+      basemodel_train_result <- list(
+        train_result = train_result,
+        no_base = length(L),
+        valpr = valpr,
+        Y.randomised = Y.randomised,
+        Order = ORDER,
+        Type = Type,
+        Nfold = Nfold,
+        Training_X_list = NULL
+      )
+      
     }
     
   }else{
@@ -170,37 +183,40 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       
       # Train the base models
       train_result[[iteration]] <- train_basemodel_core(Repeat.parLapply,
-                                                   Division,
-                                                   L,
-                                                   core,
-                                                   X.randomised,
-                                                   Y.randomised,
-                                                   Test)
+                                                        Division,
+                                                        L,
+                                                        core,
+                                                        X.randomised,
+                                                        Y.randomised,
+                                                        Test)
       
       #Creating explanatory variables for the meta model
       x.test <- X.narm[Test, ]
       start_row <- (iteration - 1) * (1 - proportion) * lY + 1
       end_row <- iteration * (1 - proportion) * lY
       if(Type == "Classification"){
-    valpr[start_row:end_row, ] <- as.character(predict(train_result[[iteration]], x.test))
-} else {
-    valpr[start_row:end_row, ] <- predict(train_result[[iteration]], x.test)
-      #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
+        valpr[start_row:end_row, ] <- as.character(predict(train_result[[iteration]], x.test))
+      } else {
+        valpr[start_row:end_row, ] <- predict(train_result[[iteration]], x.test)
+        #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
+      }
+      
+      colnames(valpr) <- 1:length(L)
+      
+      #Output training results
+      basemodel_train_result <- list(train_result = train_result,
+                                     no_base = length(L),
+                                     valpr = valpr,
+                                     Y.randomised = Y.randomised,
+                                     Order = ORDER,
+                                     Type = Type,
+                                     Nfold = Nfold,
+                                     Training_X_list = Training_X_list
+      )
+      #=>basemodel_train_resultが、cross_validation=TRUEのときにも出力されるようにしないといけません。現状そうなっていません。
     }
     
-    colnames(valpr) <- 1:length(L)
+    return(basemodel_train_result)
     
-    #Output training results
-    basemodel_train_result <- list(train_result = train_result,
-                                   no_base = length(L),
-                                   valpr = valpr,
-                                   Y.randomised = Y.randomised,
-                                   Order = ORDER,
-                                   Type = Type,
-                                   Nfold = Nfold,
-                                   Training_X_list = Training_X_list
-    )
-    basemodel_train_result
-    #=>basemodel_train_resultが、cross_validation=TRUEのときにも出力されるようにしないといけません。現状そうなっていません。
   }
-  }
+  
