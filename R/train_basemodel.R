@@ -158,6 +158,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     Training_X_list <- as.list(numeric(num_sample))
     
     valpr <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = length(L))
+    Y_stacked <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = 1)
     colnames(valpr) <- 1:length(L)
     #=>valprはメタモデルの説明変数になる予測値です。ランダムサンプルでは行数はlYではないです。(1 - number) * lY * Nfoldでは
     
@@ -200,14 +201,14 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
         valpr[start_row:end_row, ] <- predict(train_result[[iteration]], x.test)
         #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
       }
-      
+      Y_stacked[start_row:end_row, ] <- Y.randomised
       colnames(valpr) <- 1:length(L)
       
       #Output training results
       basemodel_train_result <- list(train_result = train_result,
                                      no_base = length(L),
                                      valpr = valpr,
-                                     Y.randomised = Y.randomised,
+                                     Y_stacked = Y_stacked,
                                      Order = ORDER,
                                      Type = Type,
                                      num_sample = num_sample,
