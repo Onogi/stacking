@@ -86,7 +86,8 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
     Repeat.parLapply <- 1
     Division <- matrix(1:length(L), ncol = Repeat.parLapply)
   }
-  
+
+  basemodel_train_result <- list()
   if(cross_validation){
     
     #Dividing data for cross-validation
