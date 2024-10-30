@@ -143,7 +143,7 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
       Type = Type,
       Nfold = Nfold,
       Training_X = X.randomised,
-      cross_validation = TRUE
+      cross_validation = cross_validation
     )
     
   } else {  
@@ -206,7 +206,7 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
       Type = Type,
       num_sample = num_sample,
       Training_X = Training_X,
-      cross_validation = FALSE
+      cross_validation = cross_validation
     )
   }
   
