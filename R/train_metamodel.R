@@ -1,5 +1,5 @@
 train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE, use_X = FALSE){
-
+  
   #=>basemodel_train_result（train_basemodelの出力）の要素にTraining_X_listが含まれているので、引数にはいらないのでは？
   #=>またcross_validationを、basemodel_train_resultの要素とすると、引数に入れる必要はなくなります。
   
@@ -27,100 +27,81 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     valpr <- valpr[-c((nrow(valpr) - length(Category) + 1):nrow(valpr)), ]
   }
   
-if (cross_validation) {
-  if (use_X) {  
-    if (TrainEachFold) {
-      ly <- length(basemodel_train_result$Y.randomised)
-      nfold <- basemodel_train_result$Nfold
-      if (ly %% nfold == 0) {
-        xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
+  if (cross_validation) {
+    if (use_X) {  
+      if (TrainEachFold) {
+        ly <- length(basemodel_train_result$Y.randomised)
+        nfold <- basemodel_train_result$Nfold
+        if (ly %% nfold == 0) {
+          xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
+        } else {
+          xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
+          xsoeji[1:ly] <- 1:ly
+        }
+        metamodel <- as.list(numeric(nfold))
+        for (fold in 1:nfold) {
+          test <- xsoeji[, fold]
+          x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X_list[test, ])
+          metamodel[[fold]] <- train(x_data,
+                                     basemodel_train_result$Y.randomised[test],
+                                     method = Metamodel)
+        }
       } else {
-        xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
-        xsoeji[1:ly] <- 1:ly
-      }
-      metamodel <- as.list(numeric(nfold))
-      for (fold in 1:nfold) {
-        test <- xsoeji[, fold]
-        x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X_list[test, ])
-        metamodel[[fold]] <- train(x_data,
-                                   basemodel_train_result$Y.randomised[test],
-                                   method = Metamodel)
+        x_data <- cbind(valpr, basemodel_train_result$Training_X_list)
+        metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
       }
     } else {
-      x_data <- cbind(valpr, basemodel_train_result$Training_X_list)
-      metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
-    }
-  } else {
-    if (TrainEachFold) {
-      ly <- length(basemodel_train_result$Y.randomised)
-      nfold <- basemodel_train_result$Nfold
-      if (ly %% nfold == 0) {
-        xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
+      if (TrainEachFold) {
+        ly <- length(basemodel_train_result$Y.randomised)
+        nfold <- basemodel_train_result$Nfold
+        if (ly %% nfold == 0) {
+          xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
+        } else {
+          xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
+          xsoeji[1:ly] <- 1:ly
+        }
+        metamodel <- as.list(numeric(nfold))
+        for (fold in 1:nfold) {
+          test <- xsoeji[, fold]
+          metamodel[[fold]] <- train(valpr[test, ],
+                                     basemodel_train_result$Y.randomised[test],
+                                     method = Metamodel)
+        }
       } else {
-        xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
-        xsoeji[1:ly] <- 1:ly
+        metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
       }
-      metamodel <- as.list(numeric(nfold))
-      for (fold in 1:nfold) {
-        test <- xsoeji[, fold]
-        metamodel[[fold]] <- train(valpr[test, ],
-                                   basemodel_train_result$Y.randomised[test],
-                                   method = Metamodel)
-      }
-    } else {
-      metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
     }
-  }
-  metamodel_train_result <- list(train_result = metamodel,
+    metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold)
-}
+  }
+  
+} else {
+  
+  #randomselect
+  if(use_X){
+    X_combined <- do.call(rbind, basemodel_train_result$Training_X_list)
+    feature_aggregation　<- cbind(X_combined, basemodel_train_result$valpr)
     
-  } else {
-    
-    #randomselect
-    if(use_X){
-      ly <- length(basemodel_train_result$Y.randomised)
-      nfold <- basemodel_train_result$Nfold
-      if(ly %% nfold == 0){
-        xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
-      } else {
-        xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
-        xsoeji[1:ly] <- 1:ly
-      }
-      #=>このxsoejiはcross_validation=TRUEのときに学習用サンプルを指定する機能をするものです。
-      #=>ランダムサンプリングのときは、別に考える必要があります。
-      
-      metamodel <- as.list(numeric(nfold))
-      for(fold in 1:nfold){
-        test <- xsoeji[, fold]
-        #Combine the test portion of valpr and the corresponding part of X.randomised vertically
-        combined_data <- rbind(valpr[test, ], Training_X_list[[fold]])
-
-        #=>xsoejiから作るtestも、cross_validation=TRUEのときに機能するものです
-        
-        metamodel[[fold]] <- train(combined_data,
-                                   basemodel_train_result$Y.randomised[test],
-                                   method = Metamodel)
-
-        #=>cross_validation = FALSEのときは、Xが強制的にmetamodelのtrainingに使われているようです。
-        #=>一方でcross_validation = TRUEのときは、Xはmetamodelのtrainingに使われていません。
-        #=>cross validationであってもなくても、Xをmetamodelのtrainingに加えるか否か、引数で指定する必要があるでしょう。
-      }
-    } else {
-      #Combine all of valpr and the saved X.randomised vertically
-      combined_X_randomised <- do.call(rbind, Training_X_list)
-      combined_data <- rbind(valpr, combined_X_randomised)
-      metamodel <- train(combined_data, basemodel_train_result$Y.randomised, method = Metamodel)
-
-      #=>ここも78から80行目と同じコメントです
-    }
+    metamodel <- as.list(numeric(nfold))
+    metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
     
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold)
-    metamodel_train_result
-    #=>metamodel_train_resultが、cross_validation=TRUEのときにも出力されるようにしないといけません
   }
-  }
+} else {
+  metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
+  
+  metamodel_train_result <- list(train_result = metamodel,
+                                 which_to_use = which_to_use,
+                                 TrainEachFold = TrainEachFold)
+}
 
+metamodel_train_result <- list(train_result = metamodel,
+                               which_to_use = which_to_use,
+                               num_sample = num_sample)
+
+}
+return(basemodel_train_result)
+}
