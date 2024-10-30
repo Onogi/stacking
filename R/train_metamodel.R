@@ -81,7 +81,6 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     X_combined <- do.call(rbind, basemodel_train_result$Training_X)
     feature_aggregation　<- cbind(X_combined, basemodel_train_result$valpr)
     
-    metamodel <- as.list(numeric(num_sample))
     metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
     
     metamodel_train_result <- list(train_result = metamodel,
