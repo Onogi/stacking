@@ -70,6 +70,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
         metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
       }
     }
+    
+    #Output training results
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold,
@@ -86,6 +88,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
     } else {
       metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
     }
+    
+    #Output training results
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold,
