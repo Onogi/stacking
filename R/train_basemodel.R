@@ -141,9 +141,9 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
         Order = ORDER,
         Type = Type,
         Nfold = Nfold,
-        Training_X_list = X
+        Training_X_list = X,
+        cross_validation = TRUE
       )
-      
     }
     
   }else{
@@ -152,7 +152,6 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     if(is.null(proportion) || proportion <= 0 || proportion > 1){
       stop("proportion must be a real number greater than 0 and less than or equal to 1.")
     }
-    #=>警告文を修正"numeric must be a real number greater than 0 and less than or equal to 1."
     
     train_result <- as.list(numeric(num_sample))
     Training_X_list <- as.list(numeric(num_sample))
@@ -160,22 +159,15 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     valpr <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = length(L))
     Y_stacked <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = 1)
     colnames(valpr) <- 1:length(L)
-    #=>valprはメタモデルの説明変数になる予測値です。ランダムサンプルでは行数はlYではないです。(1 - number) * lY * Nfoldでは
     
     for(iteration in 1:num_sample){
-      #=>ランダムサンプリングをNfold繰り返す、という意味になる。ややこしくはないだろうか？
-      #=>ランダムサンプリングの繰り返し数を決める引数を新たに作ったほうがよいと思う
-      
       cat("CV iteration", iteration, "\n")
       
       # Randomly select training instances
       ORDER <- sample(1:lY, size = round(proportion * lY), replace = FALSE)
-      #=>sample_fracを使うためには、パッケージのインストールが必要ではないか？（Momocs?）
-      #=>外部パッケージへの依存が少ない方が維持は楽。別のやり方でサンプリングできないか？
-      
+
       # Use the rest of the instances as test set
-      Test <- setdiff(1:lY, ORDER)
-      
+      Test <- setdiff(1:lY, ORDER) 
       Y.randomised <- Y.narm[ORDER]
       X.randomised <- X.narm[ORDER, ]
       
@@ -199,7 +191,6 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
         valpr[start_row:end_row, ] <- as.character(predict(train_result[[iteration]], x.test))
       } else {
         valpr[start_row:end_row, ] <- predict(train_result[[iteration]], x.test)
-        #=>これはcross_validationのときの予測値のスタック方法です。ランダムサンプリングのときは変わります。
       }
       Y_stacked[start_row:end_row, ] <- Y.randomised
       colnames(valpr) <- 1:length(L)
@@ -212,12 +203,10 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
                                      Order = ORDER,
                                      Type = Type,
                                      num_sample = num_sample,
-                                     Training_X_list = Training_X_list
+                                     Training_X_list = Training_X_list,
+                                     cross_validation = FALSE
       )
-      #=>basemodel_train_resultが、cross_validation=TRUEのときにも出力されるようにしないといけません。現状そうなっていません。
     }
-    
     return(basemodel_train_result)
-    
   }
   
