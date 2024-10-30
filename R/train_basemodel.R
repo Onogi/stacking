@@ -1,8 +1,5 @@
 train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, num_sample, proportion = 0.8){
   
-  #=>引数numberはproportionなどがよい
-  #=>numberには初期値を与えておく（0.8あたり）
-  
   if(is.factor(Y)) {
     Type <- "Classification"
     Y <- as.character(Y)
@@ -209,4 +206,4 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     }
     return(basemodel_train_result)
   }
-  
+  }
