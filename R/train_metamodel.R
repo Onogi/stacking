@@ -71,33 +71,22 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold)
-  }
-  
-} else {
-  
-  #randomselect
-  if(use_X){
-    X_combined <- do.call(rbind, basemodel_train_result$Training_X)
-    feature_aggregation　<- cbind(X_combined, basemodel_train_result$valpr)
     
-    metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
+  } else {
     
+    # Training meta models (Random select)
+    if (use_X) {
+      X_combined <- do.call(rbind, basemodel_train_result$Training_X)
+      feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
+      
+      metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
+    } else {
+      metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
+    }
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold)
   }
-} else {
-  metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
   
-  metamodel_train_result <- list(train_result = metamodel,
-                                 which_to_use = which_to_use,
-                                 TrainEachFold = TrainEachFold)
-}
-
-metamodel_train_result <- list(train_result = metamodel,
-                               which_to_use = which_to_use,
-                               TrainEachFold = TrainEachFold)
-
-}
-return(basemodel_train_result)
+  return(metamodel_train_result)  
 }
