@@ -71,6 +71,9 @@ if (cross_validation) {
       metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
     }
   }
+  metamodel_train_result <- list(train_result = metamodel,
+                                   which_to_use = which_to_use,
+                                   TrainEachFold = TrainEachFold)
 }
     
   } else {
