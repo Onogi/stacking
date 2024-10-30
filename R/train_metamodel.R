@@ -1,4 +1,4 @@
-train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE, use_X = FALSE){
+train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, TrainEachFold = FALSE, use_X = FALSE){
   
   nb <- basemodel_train_result$no_base
   
@@ -25,6 +25,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
   }
   
   if (basemodel_train_result$cross_validation) {
+
+    # Training meta models
     if (use_X) {  
       if (TrainEachFold) {
         ly <- length(basemodel_train_result$Y.randomised)
@@ -70,7 +72,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     }
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
-                                   TrainEachFold = TrainEachFold)
+                                   TrainEachFold = TrainEachFold,
+                                   cross_validation = cross_validation)
     
   } else {
     
@@ -85,7 +88,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     }
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
-                                   TrainEachFold = TrainEachFold)
+                                   TrainEachFold = TrainEachFold,
+                                   cross_validation = cross_validation)
   }
   
   return(metamodel_train_result)  
