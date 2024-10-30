@@ -97,7 +97,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
 
 metamodel_train_result <- list(train_result = metamodel,
                                which_to_use = which_to_use,
-                               num_sample = num_sample)
+                               TrainEachFold = TrainEachFold)
 
 }
 return(basemodel_train_result)
