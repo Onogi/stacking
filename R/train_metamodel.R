@@ -79,7 +79,7 @@ if (cross_validation) {
   } else {
     
     #randomselect
-    if(TrainEachFold){
+    if(use_X){
       ly <- length(basemodel_train_result$Y.randomised)
       nfold <- basemodel_train_result$Nfold
       if(ly %% nfold == 0){
