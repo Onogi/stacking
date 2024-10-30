@@ -1,6 +1,4 @@
 train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE, use_X = FALSE){
-  
-  #=>basemodel_train_result（train_basemodelの出力）の要素にTraining_X_listが含まれているので、引数にはいらないのでは？
   #=>またcross_validationを、basemodel_train_resultの要素とすると、引数に入れる必要はなくなります。
   
   nb <- basemodel_train_result$no_base
@@ -27,7 +25,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
     valpr <- valpr[-c((nrow(valpr) - length(Category) + 1):nrow(valpr)), ]
   }
   
-  if (cross_validation) {
+  if (basemodel_train_result$cross_validation) {
     if (use_X) {  
       if (TrainEachFold) {
         ly <- length(basemodel_train_result$Y.randomised)
@@ -41,13 +39,13 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
         metamodel <- as.list(numeric(nfold))
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
-          x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X_list[test, ])
+          x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X[test, ])
           metamodel[[fold]] <- train(x_data,
                                      basemodel_train_result$Y.randomised[test],
                                      method = Metamodel)
         }
       } else {
-        x_data <- cbind(valpr, basemodel_train_result$Training_X_list)
+        x_data <- cbind(valpr, basemodel_train_result$Training_X)
         metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
       }
     } else {
@@ -80,10 +78,10 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cro
   
   #randomselect
   if(use_X){
-    X_combined <- do.call(rbind, basemodel_train_result$Training_X_list)
+    X_combined <- do.call(rbind, basemodel_train_result$Training_X)
     feature_aggregation　<- cbind(X_combined, basemodel_train_result$valpr)
     
-    metamodel <- as.list(numeric(nfold))
+    metamodel <- as.list(numeric(num_sample))
     metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
     
     metamodel_train_result <- list(train_result = metamodel,
