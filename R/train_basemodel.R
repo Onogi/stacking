@@ -1,4 +1,4 @@
-train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, num_sample, proportion = 0.8){
+train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_validation = FALSE, proportion = 0.8){
   
   if(is.factor(Y)) {
     Type <- "Classification"
