@@ -86,30 +86,30 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
     Repeat.parLapply <- 1
     Division <- matrix(1:length(L), ncol = Repeat.parLapply)
   }
-
+  
   basemodel_train_result <- list()
-  if(cross_validation){
+  
+  if (cross_validation) {
     
-    #Dividing data for cross-validation
-    ORDER <- sample(1:lY, lY, replace=FALSE)
+    # Dividing data for cross-validation
+    ORDER <- sample(1:lY, lY, replace = FALSE)
     Y.randomised <- Y.narm[ORDER]
     X.randomised <- X.narm[ORDER, ]
     
-    if(lY%%Nfold == 0){
+    if (lY %% Nfold == 0) {
       xsoeji <- matrix(1:lY, nrow = lY %/% Nfold, ncol = Nfold)
-    }else{
+    } else {
       xsoeji <- matrix(0, nrow = lY %/% Nfold + 1, ncol = Nfold)
       xsoeji[1:lY] <- 1:lY
     }
     
-    #Training base models
+    # Training base models
     train_result <- as.list(numeric(Nfold))
     
     valpr <- matrix(nrow = lY, ncol = length(L))
     colnames(valpr) <- 1:length(L)
     
-    for(fold in 1:Nfold){
-      
+    for (fold in 1:Nfold) {
       cat("CV fold", fold, "\n")
       Test <- xsoeji[, fold]
       train_result[[fold]] <- train_basemodel_core(Repeat.parLapply,
@@ -120,34 +120,36 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
                                                    Y.randomised,
                                                    Test)
       
-      #Creating explanatory variables for the meta model
+      # Creating explanatory variables for the meta model
       x.test <- X.randomised[Test, ]
-      if(Type == "Classification"){
-        for(k in 1:length(L))
+      if (Type == "Classification") {
+        for (k in 1:length(L)) {
           valpr[Test, k] <- as.character(predict(train_result[[fold]][[k]], x.test))
+        }
       } else {
-        for(k in 1:length(L))
+        for (k in 1:length(L)) {
           valpr[Test, k] <- predict(train_result[[fold]][[k]], x.test)
+        }
       }
-      
-      #Output training results
-      basemodel_train_result <- list(
-        train_result = train_result,
-        no_base = length(L),
-        valpr = valpr,
-        Y.randomised = Y.randomised,
-        Order = ORDER,
-        Type = Type,
-        Nfold = Nfold,
-        Training_X_list = X,
-        cross_validation = TRUE
-      )
     }
     
-  }else{
+    # Output training results
+    basemodel_train_result <- list(
+      train_result = train_result,
+      no_base = length(L),
+      valpr = valpr,
+      Y.randomised = Y.randomised,
+      Order = ORDER,
+      Type = Type,
+      Nfold = Nfold,
+      Training_X_list = X,
+      cross_validation = TRUE
+    )
     
-    # Training base models(Random select)
-    if(is.null(proportion) || proportion <= 0 || proportion > 1){
+  } else {  # elseのスペルを修正
+    
+    # Training base models (Random select)
+    if (is.null(proportion) || proportion <= 0 || proportion > 1) {
       stop("proportion must be a real number greater than 0 and less than or equal to 1.")
     }
     
@@ -158,12 +160,12 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
     Y_stacked <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = 1)
     colnames(valpr) <- 1:length(L)
     
-    for(iteration in 1:num_sample){
+    for (iteration in 1:num_sample) {
       cat("CV iteration", iteration, "\n")
       
       # Randomly select training instances
       ORDER <- sample(1:lY, size = round(proportion * lY), replace = FALSE)
-
+      
       # Use the rest of the instances as test set
       Test <- setdiff(1:lY, ORDER) 
       Y.randomised <- Y.narm[ORDER]
@@ -181,30 +183,32 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
                                                         Y.randomised,
                                                         Test)
       
-      #Creating explanatory variables for the meta model
+      # Creating explanatory variables for the meta model
       x.test <- X.narm[Test, ]
       start_row <- (iteration - 1) * (1 - proportion) * lY + 1
       end_row <- iteration * (1 - proportion) * lY
-      if(Type == "Classification"){
+      if (Type == "Classification") {
         valpr[start_row:end_row, ] <- as.character(predict(train_result[[iteration]], x.test))
       } else {
         valpr[start_row:end_row, ] <- predict(train_result[[iteration]], x.test)
       }
-      Y_stacked[start_row:end_row, ] <- Y.randomised
-      colnames(valpr) <- 1:length(L)
       
-      #Output training results
-      basemodel_train_result <- list(train_result = train_result,
-                                     no_base = length(L),
-                                     valpr = valpr,
-                                     Y_stacked = Y_stacked,
-                                     Order = ORDER,
-                                     Type = Type,
-                                     num_sample = num_sample,
-                                     Training_X_list = Training_X_list,
-                                     cross_validation = FALSE
-      )
+      Y_stacked[start_row:end_row, ] <- Y.randomised
     }
-    return(basemodel_train_result)
+    
+    # Output training results
+    basemodel_train_result <- list(
+      train_result = train_result,
+      no_base = length(L),
+      valpr = valpr,
+      Y_stacked = Y_stacked,
+      Order = ORDER,
+      Type = Type,
+      num_sample = num_sample,
+      Training_X_list = Training_X_list,
+      cross_validation = FALSE
+    )
   }
-  }
+  
+  return(basemodel_train_result)
+}
