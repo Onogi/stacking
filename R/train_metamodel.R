@@ -1,5 +1,4 @@
 train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, cross_validation = FALSE, TrainEachFold = FALSE, use_X = FALSE){
-  #=>またcross_validationを、basemodel_train_resultの要素とすると、引数に入れる必要はなくなります。
   
   nb <- basemodel_train_result$no_base
   
