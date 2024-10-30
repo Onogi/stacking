@@ -146,7 +146,7 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
       cross_validation = TRUE
     )
     
-  } else {  # elseのスペルを修正
+  } else {  
     
     # Training base models (Random select)
     if (is.null(proportion) || proportion <= 0 || proportion > 1) {
