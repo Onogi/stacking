@@ -75,7 +75,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold,
-                                   cross_validation = cross_validation)
+                                   cross_validation = basemodel_train_result$cross_validation)
     
   } else {
     
@@ -93,7 +93,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
     metamodel_train_result <- list(train_result = metamodel,
                                    which_to_use = which_to_use,
                                    TrainEachFold = TrainEachFold,
-                                   cross_validation = cross_validation)
+                                   cross_validation = basemodel_train_result$cross_validation)
   }
   
   return(metamodel_train_result)  
