@@ -1,4 +1,4 @@
-stacking_train <- function(X, Y, Nfold, num_sample,　Method, Metamodel, TrainEachFold = FALSE, core = 1, cross_validation = FALSE, use_X = FALSE, proportion = 0.8) {
+stacking_train <- function(X, Y, Nfold, num_sample, Method, Metamodel, TrainEachFold = FALSE, core = 1, cross_validation = FALSE, use_X = FALSE, proportion = 0.8) {
 
   base <- train_basemodel(X, Y, Nfold, num_sample, Method, core, cross_validation, proportion)
 
