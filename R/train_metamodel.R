@@ -16,6 +16,9 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
   
   if(basemodel_train_result$Type == "Classification"){
     Category <- sort(unique(basemodel_train_result$Y.randomised))
+    ################################################################################################
+    #basemodel_train_resultのYの要素名がcross-validationとrandom samplingで異なる場合は、ここでエラーになる
+    ################################################################################################
     # Add all categories to each base model output (to make model.matrix outputs same as prediction)
     Addline <- matrix(Category, nrow = length(Category), ncol = nb)
     valpr <- rbind(valpr, Addline)
@@ -80,7 +83,11 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
                                    TrainEachFold = TrainEachFold)
     
   } else {
-    
+    ############################################
+    #ここもTrainEachFoldで2つに分けてもいいのでは？
+    #TRUE：random samplingのiterationごとに学習
+    #FALSE：まとめて学習
+    ############################################
     # Training meta models (Random select)
     if (use_X) {
       X_combined <- do.call(rbind, basemodel_train_result$Training_X)
