@@ -159,7 +159,8 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     train_result <- as.list(numeric(num_sample))
     Training_X <- as.list(numeric(num_sample))
 
-    sample_rows <- round((1 - proportion) * lY * num_sample)
+    sample_size <- round(proportion * lY)
+    sample_rows <- (lY - sample_size) * num_sample
     if (sample_rows < 1) {
     stop("Error: The number of sample rows is less than 1. Adjust the proportion value.")
 }
@@ -202,13 +203,18 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       
       # Creating explanatory variables for the meta model
       x.test <- X.narm[Test, ]
-      start_row <- (iteration - 1) * (1 - proportion) * lY + 1
-      end_row <- iteration * (1 - proportion) * lY
+      start_row <- (iteration - 1) * (lY - sample_size) + 1
+      end_row <- iteration * (lY - sample_size)
+      
       if (Type == "Classification") {
-        valpr[start_row:end_row, ] <- as.character(predict(train_result[[iteration]], x.test))
-      } else {
-        valpr[start_row:end_row, ] <- predict(train_result[[iteration]], x.test)
+      for (j in 1:length(L)) {
+      valpr[start_row:end_row, j] <- as.character(predict(train_result[[iteration]][[j]], x.test))
       }
+      } else {
+      for (j in 1:length(L)) {
+      valpr[start_row:end_row, j] <- predict(train_result[[iteration]][[j]], x.test)
+      }
+    }
       ################################################################################################################################################
       #train_basemodel_coreの戻り値は、base modelの数の長さのリストです。そのため、train_result[[iteration]]は長さlength(L)のリストになります。
       #Testデータに対する予測値をvalprに格納するところでは、train_result[[iteration]]の各要素（base model）にx.testを与えて予測値を得、それをvalprに格納していきます。
