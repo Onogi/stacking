@@ -1,4 +1,4 @@
-train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, TrainEachFold = FALSE, use_X = FALSE, num_sample = 10, proportion = 0.8){
+train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, TrainEachFold = FALSE, use_X = FALSE){
 #元のXを含むことをuse_Xとしているがより適切な名称があれば変更する。
   
   nb <- basemodel_train_result$no_base
