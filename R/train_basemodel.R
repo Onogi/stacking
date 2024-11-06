@@ -158,9 +158,13 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     
     train_result <- as.list(numeric(num_sample))
     Training_X <- as.list(numeric(num_sample))
-    
-    valpr <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = length(L))
-    Y_stacked <- matrix(nrow = (1 - proportion) * lY * num_sample, ncol = 1)
+
+    sample_rows <- round((1 - proportion) * lY * num_sample)
+    if (sample_rows < 1) {
+    stop("Error: The number of sample rows is less than 1. Adjust the proportion value.")
+}
+    valpr <- matrix(nrow = sample_rows, ncol = length(L))
+    Y_stacked <- matrix(nrow = sample_rows, ncol = 1)
     ####################################################################################################################
     #proportion * lYが整数でないことを考える必要があります。roundで丸めるとよいでしょう。
     #またproportion * lYが1未満のときはエラーで止まった方が無難そうです。
