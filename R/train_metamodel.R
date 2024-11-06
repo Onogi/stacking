@@ -90,11 +90,17 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
     ############################################
     # Training meta models (Random select)
     if (use_X) {
+      if (TrainEachFold) {
+        #各イテレーションごとにvalprとy_stacked、Training_Xの該当部分を抜き出し学習する。
+        }else{
       X_combined <- do.call(rbind, basemodel_train_result$Training_X)
       feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
       
       metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
     } else {
+       if (TrainEachFold) {
+         #各イテレーションごとにvalprとy_stackedに該当部分を抜き出し学習する
+         }else{
       metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
     }
     
