@@ -1,4 +1,4 @@
-train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_validation = FALSE, proportion = 0.8){
+train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, num_sample = 10, proportion = 0.8){
 
   ##############################################################################################################################################
   #num_sampleはランダムサンプリングのときしか使われないので、引数の後ろの方に回した方がよいです。また適当な初期値を与えておきましょう（num_sample = 10あたり）
@@ -168,7 +168,7 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
     colnames(valpr) <- 1:length(L)
     
     for (iteration in 1:num_sample) {
-      cat("CV iteration", iteration, "\n")
+      cat("CV Random sampling iteration", iteration, "\n")
       ##############################################################
       #このメッセージは"Random sampling iteration"にしておきましょうか
       ##############################################################
@@ -218,7 +218,7 @@ train_basemodel <- function(X, Y, Nfold, num_sample, Method, core = 1, cross_val
       train_result = train_result,
       no_base = length(L),
       valpr = valpr,
-      Y_stacked = Y_stacked,
+      Y.randomized = Y_stacked,
       Order = ORDER,
       Type = Type,
       num_sample = num_sample,
