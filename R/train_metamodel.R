@@ -96,8 +96,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
       if (TrainEachFold) {
         metamodel <- as.list(numeric(num_sample))
         for (iteration in 1:num_sample) {
-          start_row <- (iteration - 1) * (lY - sample_size) + 1
-          end_row <- iteration * (lY - sample_size)
+          start_row <- (iteration - 1) * sample_size + 1
+          end_row <- start_row + sample_size - 1
           valpr <- basemodel_train_result$valpr[start_row:end_row, ]
           X.randomised <- basemodel_train_result$Training_X[[iteration]]
           Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
@@ -113,8 +113,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
        if (TrainEachFold) {
          metamodel <- as.list(numeric(num_sample))
          for (iteration in 1:num_sample) {
-           start_row <- (iteration - 1) * (lY - sample_size) + 1
-           end_row <- iteration * (lY - sample_size)
+           start_row <- (iteration - 1) * sample_size + 1
+           end_row <- start_row + sample_size - 1
            valpr <- basemodel_train_result$valpr[start_row:end_row, ]
            Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
            metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
