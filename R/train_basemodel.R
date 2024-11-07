@@ -180,15 +180,15 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       ##############################################################
       
       # Randomly select training instances
-      ORDER[iteration] <- sample(1:lY, size = sample_size, replace = FALSE)
+      ORDER[[iteration]] <- sample(1:lY, size = sample_size, replace = FALSE)
       ################################################################################################################
       #ここはroundで丸めてますね。最初に一回丸めて、その数字を適当なオブジェクトに格納し、あとでそれを使いまわすとよいと思います。
       #################################################################################################################
       
       # Use the rest of the instances as test set
-      Test <- setdiff(1:lY, ORDER[iteration]) 
-      Y.randomised <- Y.narm[ORDER[iteration]]
-      X.randomised <- X.narm[ORDER[iteration], ]
+      Test <- setdiff(1:lY, ORDER[[iteration]]) 
+      Y.randomised <- Y.narm[ORDER[[iteration]]]
+      X.randomised <- X.narm[ORDER[[iteration]], ]
       
       # Save X.randomised in a list
       Training_X[[iteration]] <- X.randomised
