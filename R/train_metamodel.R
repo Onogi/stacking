@@ -105,10 +105,10 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
         }
       }else{
-        X_combined <- do.call(rbind, basemodel_train_result$Training_X)
-        feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
-        
-        metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
+         X_combined <- do.call(rbind, basemodel_train_result$Training_X)
+         feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
+         metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
+        }
       } else {
         if (TrainEachFold) {
           metamodel <- as.list(numeric(num_sample))
@@ -122,7 +122,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
         }else{
           metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
         }
-        
+      }
+    }
         #Output training results
         metamodel_train_result <- list(train_result = metamodel,
                                        which_to_use = which_to_use,
