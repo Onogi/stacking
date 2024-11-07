@@ -89,9 +89,21 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
     #FALSE：まとめて学習
     ############################################
     # Training meta models (Random select)
+    num_sample <- basemodel_train_result$num_sample
+    sample_size <- basemodel_train_result$sample_size
+    
     if (use_X) {
       if (TrainEachFold) {
-        #各イテレーションごとにvalprとy_stacked、Training_Xの該当部分を抜き出し学習する。
+        metamodel <- as.list(numeric(num_sample))
+        for (iteration in 1:num_sample) {
+          start_row <- (iteration - 1) * (lY - sample_size) + 1
+          end_row <- iteration * (lY - sample_size)
+          valpr <- basemodel_train_result$valpr[start_row:end_row, ]
+          X.randomised <- basemodel_train_result$Training_X[[iteration]]
+          Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
+          feature_aggregation <- cbind(valpr, X.randomised)
+          metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
+          }
         }else{
       X_combined <- do.call(rbind, basemodel_train_result$Training_X)
       feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
@@ -99,7 +111,14 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
       metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
     } else {
        if (TrainEachFold) {
-         #各イテレーションごとにvalprとy_stackedに該当部分を抜き出し学習する
+         metamodel <- as.list(numeric(num_sample))
+         for (iteration in 1:num_sample) {
+           start_row <- (iteration - 1) * (lY - sample_size) + 1
+           end_row <- iteration * (lY - sample_size)
+           valpr <- basemodel_train_result$valpr[start_row:end_row, ]
+           Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
+           metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
+           }
          }else{
       metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
     }
