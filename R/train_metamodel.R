@@ -1,5 +1,5 @@
 train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, TrainEachFold = FALSE, use_X = FALSE){
-#元のXを含むことをuse_Xとしているがより適切な名称があれば変更する。
+  #元のXを含むことをuse_Xとしているがより適切な名称があれば変更する。
   
   nb <- basemodel_train_result$no_base
   
@@ -29,7 +29,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
   }
   
   if (basemodel_train_result$cross_validation) {
-
+    
     # Training meta models
     if (use_X) {  
       if (TrainEachFold) {
@@ -103,33 +103,34 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, Tra
           Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
           feature_aggregation <- cbind(valpr, X.randomised)
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
+        }
+      }else{
+        X_combined <- do.call(rbind, basemodel_train_result$Training_X)
+        feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
+        
+        metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
+      } else {
+        if (TrainEachFold) {
+          metamodel <- as.list(numeric(num_sample))
+          for (iteration in 1:num_sample) {
+            start_row <- (iteration - 1) * sample_size + 1
+            end_row <- start_row + sample_size - 1
+            valpr <- basemodel_train_result$valpr[start_row:end_row, ]
+            Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
+            metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
           }
         }else{
-      X_combined <- do.call(rbind, basemodel_train_result$Training_X)
-      feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
+          metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
+        }
+        
+        #Output training results
+        metamodel_train_result <- list(train_result = metamodel,
+                                       which_to_use = which_to_use,
+                                       cross_validation = basemodel_train_result$cross_validation,
+                                       use_X = use_X,
+                                       TrainEachFold = TrainEachFold)
+      }
       
-      metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
-    } else {
-       if (TrainEachFold) {
-         metamodel <- as.list(numeric(num_sample))
-         for (iteration in 1:num_sample) {
-           start_row <- (iteration - 1) * sample_size + 1
-           end_row <- start_row + sample_size - 1
-           valpr <- basemodel_train_result$valpr[start_row:end_row, ]
-           Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
-           metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
-           }
-         }else{
-      metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
+      return(metamodel_train_result)  
     }
     
-    #Output training results
-    metamodel_train_result <- list(train_result = metamodel,
-                                   which_to_use = which_to_use,
-                                   cross_validation = basemodel_train_result$cross_validation,
-                                   use_X = use_X,
-                                   TrainEachFold = TrainEachFold)
-  }
-  
-  return(metamodel_train_result)  
-}
