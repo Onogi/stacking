@@ -158,6 +158,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     
     train_result <- as.list(numeric(num_sample))
     Training_X <- as.list(numeric(num_sample))
+    ORDER <- as.list(numeric(num_sample))
 
     sample_size <- round(proportion * lY)
     sample_rows <- (lY - sample_size) * num_sample
@@ -179,15 +180,15 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       ##############################################################
       
       # Randomly select training instances
-      ORDER <- sample(1:lY, size = round(proportion * lY), replace = FALSE)
+      ORDER[iteration] <- sample(1:lY, size = round(proportion * lY), replace = FALSE)
       ################################################################################################################
       #ここはroundで丸めてますね。最初に一回丸めて、その数字を適当なオブジェクトに格納し、あとでそれを使いまわすとよいと思います。
       #################################################################################################################
       
       # Use the rest of the instances as test set
-      Test <- setdiff(1:lY, ORDER) 
-      Y.randomised <- Y.narm[ORDER]
-      X.randomised <- X.narm[ORDER, ]
+      Test <- setdiff(1:lY, ORDER[iteration]) 
+      Y.randomised <- Y.narm[ORDER[iteration]]
+      X.randomised <- X.narm[ORDER[iteration], ]
       
       # Save X.randomised in a list
       Training_X[[iteration]] <- X.randomised
@@ -232,6 +233,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       Order = ORDER,
       Type = Type,
       num_sample = num_sample,
+      proportion = proportion,
       Training_X = Training_X,
       cross_validation = cross_validation
     )
