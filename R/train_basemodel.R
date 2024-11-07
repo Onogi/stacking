@@ -161,7 +161,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
     ORDER <- as.list(numeric(num_sample))
 
     sample_size <- round(proportion * lY)
-    sample_rows <- (lY - sample_size) * num_sample
+    sample_rows <- round((lY - sample_size) * num_sample)
     if (sample_rows < 1) {
     stop("Error: The number of sample rows is less than 1. Adjust the proportion value.")
 }
@@ -180,7 +180,7 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       ##############################################################
       
       # Randomly select training instances
-      ORDER[iteration] <- sample(1:lY, size = round(proportion * lY), replace = FALSE)
+      ORDER[iteration] <- sample(1:lY, size = sample_size, replace = FALSE)
       ################################################################################################################
       #ここはroundで丸めてますね。最初に一回丸めて、その数字を適当なオブジェクトに格納し、あとでそれを使いまわすとよいと思います。
       #################################################################################################################
