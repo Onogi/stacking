@@ -1,5 +1,7 @@
 stacking_train <- function(X, Y, Nfold, Method, Metamodel, TrainEachFold = FALSE, core = 1, use_X = FALSE, cross_validation = FALSE, num_sample = 10, proportion = 0.8) {
-
+  ################################################################################
+  #train_basemodel同様にNfoldの位置を変更して初期値を与える。以下もNfold1の位置が要修正
+  ################################################################################
   base <- train_basemodel(X, Y, Nfold, Method, core, cross_validation, num_sample, proportion)
 
   which_to_use <- 1:base$no_base
