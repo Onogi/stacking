@@ -1,8 +1,11 @@
 train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FALSE, num_sample = 10, proportion = 0.8){
 
-  ##############################################################################################################################################
-  #num_sampleはランダムサンプリングのときしか使われないので、引数の後ろの方に回した方がよいです。また適当な初期値を与えておきましょう（num_sample = 10あたり）
-  ##############################################################################################################################################
+  #####################################################################################################
+  #subsamplingを加えたため、必ず交差検証するわけではなくなったので、
+  #Nfoldの順番も後ろに回した方がよいですね。
+  #Nfold = 10として、cross_validationの後ろに回してください。
+  #引数の順番を変えると、他の関数やマニュアル、マニュアルのexampleも全て変える必要がでてくるので、結構厄介ですが
+  #######################################################################################################
   if(is.factor(Y)) {
     Type <- "Classification"
     Y <- as.character(Y)
@@ -162,28 +165,21 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
 
     sample_size <- round(proportion * lY)
     sample_rows <- (lY - sample_size) * num_sample
-    if (sample_rows < 1) {
-    stop("Error: The number of sample rows is less than 1. Adjust the proportion value.")
-}
+    if (sample_size < 1) {
+      stop("Error: The number of samples in sub-sampling is less than 1. Adjust the argument proportion.")
+      ############################################################
+      #sample_rows < 1からsample_size < 1に変更、エラーメッセージも少し修正
+      #############################################################
+    }
     valpr <- matrix(nrow = sample_rows, ncol = length(L))
     Y_stacked <- matrix(nrow = sample_rows, ncol = 1)
-    ####################################################################################################################
-    #proportion * lYが整数でないことを考える必要があります。roundで丸めるとよいでしょう。
-    #またproportion * lYが1未満のときはエラーで止まった方が無難そうです。
-    #####################################################################################################################
     colnames(valpr) <- 1:length(L)
     
     for (iteration in 1:num_sample) {
-      cat("CV Random sampling iteration", iteration, "\n")
-      ##############################################################
-      #このメッセージは"Random sampling iteration"にしておきましょうか
-      ##############################################################
+      cat("Random sampling iteration", iteration, "\n")
       
       # Randomly select training instances
       ORDER[[iteration]] <- sample(1:lY, size = sample_size, replace = FALSE)
-      ################################################################################################################
-      #ここはroundで丸めてますね。最初に一回丸めて、その数字を適当なオブジェクトに格納し、あとでそれを使いまわすとよいと思います。
-      #################################################################################################################
       
       # Use the rest of the instances as test set
       Test <- setdiff(1:lY, ORDER[[iteration]]) 
@@ -208,19 +204,14 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       end_row <- iteration * (lY - sample_size)
       
       if (Type == "Classification") {
-      for (j in 1:length(L)) {
-      valpr[start_row:end_row, j] <- as.character(predict(train_result[[iteration]][[j]], x.test))
-      }
+        for (j in 1:length(L)) {
+          valpr[start_row:end_row, j] <- as.character(predict(train_result[[iteration]][[j]], x.test))
+        }
       } else {
-      for (j in 1:length(L)) {
-      valpr[start_row:end_row, j] <- predict(train_result[[iteration]][[j]], x.test)
+        for (j in 1:length(L)) {
+          valpr[start_row:end_row, j] <- predict(train_result[[iteration]][[j]], x.test)
+        }
       }
-    }
-      ################################################################################################################################################
-      #train_basemodel_coreの戻り値は、base modelの数の長さのリストです。そのため、train_result[[iteration]]は長さlength(L)のリストになります。
-      #Testデータに対する予測値をvalprに格納するところでは、train_result[[iteration]]の各要素（base model）にx.testを与えて予測値を得、それをvalprに格納していきます。
-      #cross-validationのときの129～135行目をみると、for文でbase modelの予測値を1つずつ得ているのが分かると思います。
-      #################################################################################################################################################
       Y_stacked[start_row:end_row, ] <- Y.randomised
     }
     
@@ -236,9 +227,6 @@ train_basemodel <- function(X, Y, Nfold, Method, core = 1, cross_validation = FA
       Training_X = Training_X,
       cross_validation = cross_validation
     )
-    #####################################################################################################
-    #リストの要素名は、cross-validationもrandom samplingも同じがよいと思います。Y.randomizedでいいと思います。
-    ########################################################################################################
   }
   
   return(basemodel_train_result)
