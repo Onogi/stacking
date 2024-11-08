@@ -16,9 +16,6 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
   
   if(basemodel_train_result$Type == "Classification"){
     Category <- sort(unique(basemodel_train_result$Y.randomised))
-    ################################################################################################
-    #basemodel_train_resultのYの要素名がcross-validationとrandom samplingで異なる場合は、ここでエラーになる
-    ################################################################################################
     # Add all categories to each base model output (to make model.matrix outputs same as prediction)
     Addline <- matrix(Category, nrow = length(Category), ncol = nb)
     valpr <- rbind(valpr, Addline)
@@ -83,14 +80,12 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
                                    TrainEachFold = TrainEachFold)
     
   } else {
-    ############################################
-    #ここもTrainEachFoldで2つに分けてもいいのでは？
-    #TRUE：random samplingのiterationごとに学習
-    #FALSE：まとめて学習
-    ############################################
     # Training meta models (Random select)
     num_sample <- basemodel_train_result$num_sample
     chunk_size <- nrow(basemodel_train_result$valpr)/num_sample
+    ##############################################
+    #これだとchunk_sizeが整数になる保証はないのでは？
+    ##############################################
     
     if (use_X) {
       if (TrainEachFold) {
@@ -108,30 +103,30 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
          X_combined <- do.call(rbind, basemodel_train_result$Training_X)
          feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
          metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
-        }
-      } else {
-        if (TrainEachFold) {
-          metamodel <- as.list(numeric(num_sample))
-          for (iteration in 1:num_sample) {
-            start_row <- (iteration - 1) * chunk_size + 1
-            end_row <- start_row + chunk_size - 1
-            valpr <- basemodel_train_result$valpr[start_row:end_row, ]
-            Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
-            metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
-          }
-        }else{
-          metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
-        }
       }
+    } else {
+      if (TrainEachFold) {
+        metamodel <- as.list(numeric(num_sample))
+        for (iteration in 1:num_sample) {
+          start_row <- (iteration - 1) * chunk_size + 1
+          end_row <- start_row + chunk_size - 1
+          valpr <- basemodel_train_result$valpr[start_row:end_row, ]
+          Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
+          metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
+        }
+      }else{
+        metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
+      }
+    }
     
-        #Output training results
-        metamodel_train_result <- list(train_result = metamodel,
-                                       which_to_use = which_to_use,
-                                       cross_validation = basemodel_train_result$cross_validation,
-                                       use_X = use_X,
-                                       TrainEachFold = TrainEachFold)
+    #Output training results
+    metamodel_train_result <- list(train_result = metamodel,
+                                    which_to_use = which_to_use,
+                                    cross_validation = basemodel_train_result$cross_validation,
+                                    use_X = use_X,
+                                    TrainEachFold = TrainEachFold)
     }
       
-      return(metamodel_train_result)  
-    }
+    return(metamodel_train_result)  
+}
     
