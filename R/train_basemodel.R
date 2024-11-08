@@ -161,6 +161,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
     
     train_result <- as.list(numeric(num_sample))
     Training_X <- as.list(numeric(num_sample))
+    Y_stacked <- as.list(numeric(num_sample))
     ORDER <- as.list(numeric(num_sample))
 
     sample_size <- round(proportion * lY)
@@ -172,7 +173,6 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
       #############################################################
     }
     valpr <- matrix(nrow = sample_rows, ncol = length(L))
-    Y_stacked <- matrix(nrow = sample_rows, ncol = 1)
     colnames(valpr) <- 1:length(L)
     
     for (iteration in 1:num_sample) {
@@ -186,8 +186,9 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
       Y.randomised <- Y.narm[ORDER[[iteration]]]
       X.randomised <- X.narm[ORDER[[iteration]], ]
       
-      # Save X.randomised in a list
+      # Save X.randomised Y.randomised in a list
       Training_X[[iteration]] <- X.randomised
+      Y_stacked[[iteration]] <- Y.randomised
       
       # Train the base models
       train_result[[iteration]] <- train_basemodel_core(Repeat.parLapply,
@@ -212,7 +213,6 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
           valpr[start_row:end_row, j] <- predict(train_result[[iteration]][[j]], x.test)
         }
       }
-      Y_stacked[start_row:end_row, ] <- Y.randomised
     }
     
     # Output training results
