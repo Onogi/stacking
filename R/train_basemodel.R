@@ -148,6 +148,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
       Order = ORDER,
       Type = Type,
       Nfold = Nfold,
+      Training_X = X.randomised,
       cross_validation = cross_validation
     )
     
