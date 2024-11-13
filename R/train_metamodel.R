@@ -83,9 +83,6 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
     # Training meta models (Random select)
     num_sample <- basemodel_train_result$num_sample
     chunk_size <- nrow(basemodel_train_result$valpr)/num_sample
-    ##############################################
-    #これだとchunk_sizeが整数になる保証はないのでは？
-    ##############################################
     
     if (use_X) {
       if (TrainEachFold) {
