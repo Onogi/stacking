@@ -200,6 +200,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
       
       # Creating explanatory variables for the meta model
       x.test <- X.narm[Test, ]
+      y.test <- Y.narm[Test]
       start_row <- (iteration - 1) * (lY - sample_size) + 1
       end_row <- iteration * (lY - sample_size)
       
@@ -212,7 +213,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
           valpr[start_row:end_row, j] <- predict(train_result[[iteration]][[j]], x.test)
         }
       }
-      Y_stacked[start_row:end_row, ] <- Y.randomised
+      Y_stacked[start_row:end_row, ] <- y.test
     }
     
     # Output training results
