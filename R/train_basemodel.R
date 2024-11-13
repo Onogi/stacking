@@ -170,7 +170,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
     
     valpr <- matrix(nrow = sample_rows, ncol = length(L))
     Y_stacked <- matrix(nrow = sample_rows, ncol = 1)
-    Training_X <- matrix(nrow = sample_rows, ncol = 1)
+    Training_X <- matrix(nrow = sample_rows, ncol = ncol(X.narm))
     colnames(valpr) <- 1:length(L)
     
     for (iteration in 1:num_sample) {
