@@ -91,7 +91,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           start_row <- (iteration - 1) * chunk_size + 1
           end_row <- start_row + chunk_size - 1
           valpr <- basemodel_train_result$valpr[start_row:end_row, ]
-          X.randomised <- basemodel_train_result$Training_X[[iteration]]
+          X.randomised <- basemodel_train_result$Training_X[start_row:end_row, ]
           Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
           feature_aggregation <- cbind(valpr, X.randomised)
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
