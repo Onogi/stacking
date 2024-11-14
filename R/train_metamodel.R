@@ -42,12 +42,14 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
           x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X[test, ])
+          colnames(x_data) <- 1:ncol(x_data)
           metamodel[[fold]] <- train(x_data,
                                      basemodel_train_result$Y.randomised[test],
                                      method = Metamodel)
         }
       } else {
         x_data <- cbind(valpr, basemodel_train_result$Training_X)
+        colnames(x_data) <- 1:ncol(x_data)
         metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
       }
     } else {
@@ -97,9 +99,8 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
         }
       }else{
-         X_combined <- do.call(rbind, basemodel_train_result$Training_X)
-         feature_aggregation <- cbind(X_combined, basemodel_train_result$valpr)
-         metamodel <- train(feature_aggregation, basemodel_train_result$Y_stacked, method = Metamodel)
+         feature_aggregation <- cbind(basemodel_train_result$valpr, basemodel_train_result$Training_X)
+         metamodel <- train(feature_aggregation, basemodel_train_result$Y.randomized, method = Metamodel)
       }
     } else {
       if (TrainEachFold) {
@@ -112,7 +113,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
         }
       }else{
-        metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y_stacked, method = Metamodel)
+        metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y.randomized, method = Metamodel)
       }
     }
     
