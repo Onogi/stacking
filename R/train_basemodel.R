@@ -111,7 +111,6 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
     
     # Training base models
     train_result <- as.list(numeric(Nfold))
-    
     valpr <- matrix(nrow = lY, ncol = length(L))
     colnames(valpr) <- 1:length(L)
     
@@ -161,9 +160,9 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
     
     train_result <- as.list(numeric(num_sample))
     ORDER <- as.list(numeric(num_sample))
-    
     sample_size <- round(proportion * lY)
     sample_rows <- (lY - sample_size) * num_sample
+    
     if (sample_size < 1) {
       stop("Error: The number of samples in sub-sampling is less than 1. Adjust the argument proportion.")
     }
@@ -209,8 +208,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
         }
       }
       Y_stacked[start_row:end_row, ] <- y.test
-      Training_X[start_row:end_row, ] <- x.test
-      
+      Training_X[start_row:end_row, ] <- x.test  
     }
     
     # Output training results
