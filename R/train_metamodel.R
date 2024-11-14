@@ -1,4 +1,5 @@
 train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use_X = FALSE, TrainEachFold = FALSE){
+  #元のXを含むことをuse_Xとしているがより適切な名称があれば変更する。
   
   nb <- basemodel_train_result$no_base
   
@@ -31,15 +32,13 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
       if (TrainEachFold) {
         ly <- length(basemodel_train_result$Y.randomised)
         nfold <- basemodel_train_result$Nfold
-        
         if (ly %% nfold == 0) {
           xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
         } else {
           xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
           xsoeji[1:ly] <- 1:ly
         }
-        
-        metamodel <- as.list(numeric(nfold)) 
+        metamodel <- as.list(numeric(nfold))
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
           x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X[test, ])
@@ -47,7 +46,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           metamodel[[fold]] <- train(x_data,
                                      basemodel_train_result$Y.randomised[test],
                                      method = Metamodel)
-        }  
+        }
       } else {
         x_data <- cbind(valpr, basemodel_train_result$Training_X)
         colnames(x_data) <- 1:ncol(x_data)
@@ -57,14 +56,12 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
       if (TrainEachFold) {
         ly <- length(basemodel_train_result$Y.randomised)
         nfold <- basemodel_train_result$Nfold
-        
         if (ly %% nfold == 0) {
           xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
         } else {
           xsoeji <- matrix(0, nrow = ly %/% nfold + 1, ncol = nfold)
           xsoeji[1:ly] <- 1:ly
         }
-        
         metamodel <- as.list(numeric(nfold))
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
@@ -91,34 +88,34 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
     
     if (use_X) {
       if (TrainEachFold) {
-        
         metamodel <- as.list(numeric(num_sample))
         for (iteration in 1:num_sample) {
           start_row <- (iteration - 1) * chunk_size + 1
           end_row <- start_row + chunk_size - 1
           valpr <- basemodel_train_result$valpr[start_row:end_row, ]
           X.randomised <- basemodel_train_result$Training_X[start_row:end_row, ]
-          Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
-          feature_aggregation <- cbind(valpr, X.randomised)
+          Y.randomised <- basemodel_train_result$Y.randomised[start_row:end_row, ]
+          feature_aggregation <- cbind(valpr, Y.randomised)
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
         }
       }else{
         feature_aggregation <- cbind(basemodel_train_result$valpr, basemodel_train_result$Training_X)
-        metamodel <- train(feature_aggregation, basemodel_train_result$Y.randomized, method = Metamodel)
+        Y.randomised <- as.vector(basemodel_train_result$Y.randomised)
+        metamodel <- train(feature_aggregation, Y.randomised, method = Metamodel)
       }
     } else {
       if (TrainEachFold) {
-        
         metamodel <- as.list(numeric(num_sample))
         for (iteration in 1:num_sample) {
           start_row <- (iteration - 1) * chunk_size + 1
           end_row <- start_row + chunk_size - 1
           valpr <- basemodel_train_result$valpr[start_row:end_row, ]
-          Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
+          Y.randomised <- basemodel_train_result$Y.randomised[start_row:end_row, ]
           metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
         }
       }else{
-        metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y.randomized, method = Metamodel)
+        Y.randomised <- as.vector(basemodel_train_result$Y.randomised)
+        metamodel <- train(basemodel_train_result$valpr, Y.randomised, method = Metamodel)
       }
     }
     
