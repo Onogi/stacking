@@ -1,5 +1,5 @@
 train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nfold = 10, num_sample = 10, proportion = 0.8){
-
+  
   #####################################################################################################
   #subsamplingを加えたため、必ず交差検証するわけではなくなったので、
   #Nfoldの順番も後ろに回した方がよいですね。
@@ -161,7 +161,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
     
     train_result <- as.list(numeric(num_sample))
     ORDER <- as.list(numeric(num_sample))
-
+    
     sample_size <- round(proportion * lY)
     sample_rows <- (lY - sample_size) * num_sample
     if (sample_size < 1) {
