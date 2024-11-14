@@ -39,8 +39,7 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           xsoeji[1:ly] <- 1:ly
         }
         
-        metamodel <- as.list(numeric(nfold))
-        
+        metamodel <- as.list(numeric(nfold)) 
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
           x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X[test, ])
@@ -48,18 +47,17 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           metamodel[[fold]] <- train(x_data,
                                      basemodel_train_result$Y.randomised[test],
                                      method = Metamodel)
-        }
-        
+        }  
       } else {
         x_data <- cbind(valpr, basemodel_train_result$Training_X)
         colnames(x_data) <- 1:ncol(x_data)
         metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
       }
-      
     } else {
       if (TrainEachFold) {
         ly <- length(basemodel_train_result$Y.randomised)
         nfold <- basemodel_train_result$Nfold
+        
         if (ly %% nfold == 0) {
           xsoeji <- matrix(1:ly, nrow = ly %/% nfold, ncol = nfold)
         } else {
@@ -68,14 +66,12 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
         }
         
         metamodel <- as.list(numeric(nfold))
-        
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
           metamodel[[fold]] <- train(valpr[test, ],
                                      basemodel_train_result$Y.randomised[test],
                                      method = Metamodel)
         }
-        
       } else {
         metamodel <- train(valpr, basemodel_train_result$Y.randomised, method = Metamodel)
       }
@@ -89,17 +85,14 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
                                    TrainEachFold = TrainEachFold)
     
   } else {
-    
     # Training meta models (Random select)
     num_sample <- basemodel_train_result$num_sample
     chunk_size <- nrow(basemodel_train_result$valpr)/num_sample
     
     if (use_X) {
-      
       if (TrainEachFold) {
         
         metamodel <- as.list(numeric(num_sample))
-        
         for (iteration in 1:num_sample) {
           start_row <- (iteration - 1) * chunk_size + 1
           end_row <- start_row + chunk_size - 1
@@ -109,17 +102,14 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           feature_aggregation <- cbind(valpr, X.randomised)
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
         }
-        
       }else{
         feature_aggregation <- cbind(basemodel_train_result$valpr, basemodel_train_result$Training_X)
         metamodel <- train(feature_aggregation, basemodel_train_result$Y.randomized, method = Metamodel)
       }
-      
     } else {
       if (TrainEachFold) {
         
         metamodel <- as.list(numeric(num_sample))
-        
         for (iteration in 1:num_sample) {
           start_row <- (iteration - 1) * chunk_size + 1
           end_row <- start_row + chunk_size - 1
@@ -127,7 +117,6 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           Y.randomised <- basemodel_train_result$Y.randomized[start_row:end_row, ]
           metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
         }
-        
       }else{
         metamodel <- train(basemodel_train_result$valpr, basemodel_train_result$Y.randomized, method = Metamodel)
       }
