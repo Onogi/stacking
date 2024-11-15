@@ -11,10 +11,10 @@ stacking_predict <- function(newX, stacking_train_result){
 
   colnames(newX) <- 1:ncol(newX)
   ##############################################################################
-  #crossvalidationがFALSEの際は、foldの繰り返しがiteresionに変更。
-　#use_XがTRUEの場合でもデータの形はstacking_train_result$meta$train_result、stacking_train_result$base$train_resultで抜き出されてくる。
-  #ここ以下はcrossvalidationがTRUEの際。もともとのコードである。
+  #crossvalidationのTREUとFALSEの際のコードを作成。TRUE時は従来のコードを使用。FALSE時はfoldではなくiterationで作成。
+　#use_Xの引数を考慮したコード作成？TrainEachFoldの有無は従来のコードを参照する。
   ############################
+  if(stacking_train_result$base$cross_validation){
   if(stacking_train_result$base$Type == "Classification"){
     PV <- array(data = NA, dim = c(lX, lMt, Nf))
     for(k in 1:Nf)
@@ -77,3 +77,9 @@ stacking_predict <- function(newX, stacking_train_result){
 
   result
 }
+}else{
+  if(stacking_train_result$base$Type == "Classification"){
+     PV <- array(data = NA, dim = c(lX, lMt, Nf))
+    for(k in 1:Nf)
+      for(j in 1:lMt)
+        PV[, j, k] <- as.character(predict(tr[[k]][[j]], newX))
