@@ -4,14 +4,17 @@
 \description{Training base models of stacking
 }
 \usage{
-train_basemodel(X, Y, Nfold, Method, core = 1)
+train_basemodel(X, Y, Method, core = 1, cross_validation = FALSE, Nfold = 10, num_sample = 10, proportion = 0.8)
 }
 \arguments{
   \item{X}{An N x P matrix of explanatory variables where N is the number of samples and P is the number of variables. Column names are required by caret.}
   \item{Y}{A length N Vector of objective variables. Use a factor for classification.}
-  \item{Nfold}{Number of folds for cross-validation. This cross-validation is required for training.}
   \item{Method}{A list specifying base learners. Each element of the list is a data.frame that contains hyperparameter values of base learners. The names of the list elements specifies the base learners and are passed to caret functions. See details and examples}
   \item{core}{Number of cores for parallel processing}
+  \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random selection.}
+  \item{Nfold}{Number of folds for cross-validation. This cross-validation is required for training.}
+  \item{num_sample}{The number of samples for random selection, applicable when cross_validation is set to FALSE.}
+  \item{proportion}{A parameter specifying the proportion of samples to be selected when cross_validation is set to FALSE.}
 }
 \details{
 Stacking by this package consists of the following 2 steps. (1) Nfold cross-validation is conducted with each base learner.(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts step (1). Step (2) is conducted by train_metamodel. Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).
@@ -47,7 +50,10 @@ A list containing the following elements is output.
 \item{Y.randomised}{Y ans X are randomized when cross-validation. Randomized Y is output to enable evaluation of prediction accuracy}
 \item{Order}{Order in randomization.}
 \item{Type}{Type of task (regression or classification).}
-\item{Nfold}{Number of cross-validation folds}
+\item{Nfold}{Number of cross-validation folds.}
+\item{num_sample}{Number of samples for random selection.}
+\item{Training_X}{Randomized or selected training data used in model training.}
+\item{cross_validation}{Specifies whether cross-validation (TRUE) or random selection (FALSE) was used during training.}
 }
 \author{
 Taichi Nukui, Akio Onogi
