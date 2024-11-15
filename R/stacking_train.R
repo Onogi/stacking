@@ -6,7 +6,7 @@ stacking_train <- function(X, Y, Method, Metamodel, core = 1, cross_validation =
 
   which_to_use <- 1:base$no_base
 
-  meta <- train_metamodel(base, which_to_use, Metamodel, TrainEachFold, use_X)
+  meta <- train_metamodel(base, which_to_use, Metamodel, use_X, TrainEachFold)
 
   stacking_train_result<-list(base = base,
                               meta = meta
