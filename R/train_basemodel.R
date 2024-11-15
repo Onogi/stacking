@@ -213,7 +213,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
       train_result = train_result,
       no_base = length(L),
       valpr = valpr,
-      Y.randomized = Y_stacked,
+      Y.randomised = Y_stacked,
       Order = ORDER,
       Type = Type,
       num_sample = num_sample,
