@@ -92,14 +92,14 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
         for (iteration in 1:num_sample) {
           start_row <- (iteration - 1) * chunk_size + 1
           end_row <- start_row + chunk_size - 1
-          valpr <- basemodel_train_result$valpr[start_row:end_row, ]
+          valpr_piece <- valpr[start_row:end_row, ]
           X.randomised <- basemodel_train_result$Training_X[start_row:end_row, ]
           Y.randomised <- basemodel_train_result$Y.randomised[start_row:end_row, ]
-          feature_aggregation <- cbind(valpr, Y.randomised)
+          feature_aggregation <- cbind(valpr_piece, X.randomised)
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
         }
       }else{
-        feature_aggregation <- cbind(basemodel_train_result$valpr, basemodel_train_result$Training_X)
+        feature_aggregation <- cbind(valpr, basemodel_train_result$Training_X)
         Y.randomised <- as.vector(basemodel_train_result$Y.randomised)
         metamodel <- train(feature_aggregation, Y.randomised, method = Metamodel)
       }
@@ -109,13 +109,13 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
         for (iteration in 1:num_sample) {
           start_row <- (iteration - 1) * chunk_size + 1
           end_row <- start_row + chunk_size - 1
-          valpr <- basemodel_train_result$valpr[start_row:end_row, ]
+          valpr_piece <- valpr[start_row:end_row, ]
           Y.randomised <- basemodel_train_result$Y.randomised[start_row:end_row, ]
-          metamodel[[iteration]] <- train(valpr, Y.randomised, method = Metamodel)
+          metamodel[[iteration]] <- train(valpr_piece, Y.randomised, method = Metamodel)
         }
       }else{
         Y.randomised <- as.vector(basemodel_train_result$Y.randomised)
-        metamodel <- train(basemodel_train_result$valpr, Y.randomised, method = Metamodel)
+        metamodel <- train(valpr, Y.randomised, method = Metamodel)
       }
     }
     
