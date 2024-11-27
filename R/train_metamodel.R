@@ -40,15 +40,13 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
         metamodel <- as.list(numeric(nfold))
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
-          x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X[test, ])
-          colnames(x_data) <- 1:ncol(x_data)
+          x_data <- data.frame(cbind(valpr[test, ], basemodel_train_result$Training_X[test, ]))
           metamodel[[fold]] <- train(x_data,
                                      basemodel_train_result$Y.randomised[test],
                                      method = Metamodel)
         }
       } else {
-        x_data <- cbind(valpr, basemodel_train_result$Training_X)
-        colnames(x_data) <- 1:ncol(x_data)
+        x_data <- data.frame(cbind(valpr, basemodel_train_result$Training_X))
         metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
       }
     } else {
