@@ -40,13 +40,24 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
         metamodel <- as.list(numeric(nfold))
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
-          x_data <- data.frame(cbind(valpr[test, ], basemodel_train_result$Training_X[test, ]))
+          x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X[test, ])
+          if(basemodel_train_result$Type == "Classification"){
+            colnames(x_data)[(ncol(valpr) + 1):ncol(x_data)] <- as.character(1:(ncol(x_data) - ncol(valpr)))
+          } else {
+            colnames(x_data) <- as.character(1:ncol(x_data))
+          }
+          
           metamodel[[fold]] <- train(x_data,
                                      basemodel_train_result$Y.randomised[test],
                                      method = Metamodel)
         }
       } else {
-        x_data <- data.frame(cbind(valpr, basemodel_train_result$Training_X))
+        x_data <- cbind(valpr, basemodel_train_result$Training_X)
+        if(basemodel_train_result$Type == "Classification"){
+          colnames(x_data)[(ncol(valpr) + 1):ncol(x_data)] <- as.character(1:(ncol(x_data) - ncol(valpr)))
+        } else {
+          colnames(x_data) <- as.character(1:ncol(x_data))
+        }
         metamodel <- train(x_data, basemodel_train_result$Y.randomised, method = Metamodel)
       }
     } else {
@@ -92,11 +103,21 @@ train_metamodel <- function(basemodel_train_result, which_to_use, Metamodel, use
           valpr_piece <- valpr[start_row:end_row, ]
           X.randomised <- basemodel_train_result$Training_X[start_row:end_row, ]
           Y.randomised <- basemodel_train_result$Y.randomised[start_row:end_row, ]
-          feature_aggregation <- data.frame(cbind(valpr_piece, X.randomised))
+          feature_aggregation <- cbind(valpr_piece, X.randomised)
+          if(basemodel_train_result$Type == "Classification"){
+            colnames(feature_aggregation)[(ncol(valpr_piece) + 1):ncol(feature_aggregation)] <- as.character(1:(ncol(feature_aggregation) - ncol(valpr_piece)))
+          } else {
+            colnames(feature_aggregation) <- as.character(1:ncol(feature_aggregation))
+          }
           metamodel[[iteration]] <- train(feature_aggregation, Y.randomised, method = Metamodel)
         }
       }else{
-        feature_aggregation <- data.frame(cbind(valpr, basemodel_train_result$Training_X))
+        feature_aggregation <- cbind(valpr, basemodel_train_result$Training_X)
+        if(basemodel_train_result$Type == "Classification"){
+          colnames(feature_aggregation)[(ncol(valpr) + 1):ncol(feature_aggregation)] <- as.character(1:(ncol(feature_aggregation) - ncol(valpr)))
+        } else {
+          colnames(feature_aggregation) <- as.character(1:ncol(feature_aggregation))
+        }
         Y.randomised <- as.vector(basemodel_train_result$Y.randomised)
         metamodel <- train(feature_aggregation, Y.randomised, method = Metamodel)
       }
