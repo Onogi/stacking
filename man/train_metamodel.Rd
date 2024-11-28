@@ -5,12 +5,13 @@
 Training a meta model of stacking
 }
 \usage{
-train_metamodel(basemodel_train_result, which_to_use, Metamodel, TrainEachFold = FALSE)
+train_metamodel(basemodel_train_result, which_to_use, Metamodel, use_X = FALSE, TrainEachFold = FALSE)
 }
 \arguments{
   \item{basemodel_train_result}{The list output by train_basemodel}
   \item{which_to_use}{A vector of integers between 1 and L where L is the number of base models. These integers specify the base models used for training the meta model.}
   \item{Metamodel}{A strings specifying the meta learner}
+  \item{use_X}{A logical indicating whether the meta-learner uses the original features X along with the base model predictions. If TRUE, it uses both X and the predictions; if FALSE, it uses only the predictions.}
   \item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold or not. If TRUE, the meta learners learns Nfold times using the values predicted by the base models at each fold. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds.}
 }
 \details{
@@ -24,6 +25,8 @@ Meta learners can be chosen from the methods implemented in caret. The choosable
 A list containing the following elements is output.
 \item{train_result}{A list containing the training results of the meta model, which is the list output by train function of caret. When TrainEachFold is TRUE, the length of list is Nfold because the meta learner is trained Nfold times.}
 \item{which_to_use}{which_to_use given as the argument}
+\item{cross_validation}{}
+\item{use_X}{use_X}
 \item{TrainEachFold}{TrainEachFold}
 }
 \author{
