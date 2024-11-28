@@ -25,7 +25,7 @@ Meta learners can be chosen from the methods implemented in caret. The choosable
 A list containing the following elements is output.
 \item{train_result}{A list containing the training results of the meta model, which is the list output by train function of caret. When TrainEachFold is TRUE, the length of list is Nfold because the meta learner is trained Nfold times.}
 \item{which_to_use}{which_to_use given as the argument}
-\item{cross_validation}{}
+\item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random selection.}
 \item{use_X}{use_X}
 \item{TrainEachFold}{TrainEachFold}
 }
