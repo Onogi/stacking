@@ -102,7 +102,6 @@ stacking_predict <- function(newX, stacking_train_result){
       for(k in 1:Nf)
         for(j in 1:lMt)
           PV[, j] <- PV[, j] + predict(tr[[k]][[j]], newX)
-      mPV <- data.frame()
       mPV <- PV/Nf
       mPV <- cbind(mPV, newX)
       colnames(mPV) <- as.character(1:ncol(mPV))
@@ -123,7 +122,7 @@ stacking_predict <- function(newX, stacking_train_result){
         PV[, j] <- PV[, j] + predict(tr[[k]][[j]], newX)
     
     mPV <- PV/Nf
-    colnames(mPV) <- 1:lMt
+    colnames(mPV) <- as.character(1:ncol(mPV))
     
     if(stacking_train_result$meta$TrainEachFold){
       result <- 0
