@@ -1,8 +1,5 @@
 train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nfold = 10, num_sample = 10, proportion = 0.8){
-  
-  #####################################################################################################
-  #引数の順番を変えると、他の関数やマニュアル、マニュアルのexampleも全て変える必要がでてくるので、結構厄介ですが
-  #######################################################################################################
+
   if(is.factor(Y)) {
     Type <- "Classification"
     Y <- as.character(Y)
@@ -31,7 +28,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
       check[m] <- 1
     }
   }
-  if(any(check>0)){stop("Please confirm the names/spellings of the following methods")}
+  if(any(check>0)){stop("Please confirm the names/spellings of the presented methods")}
   
   #Checking the names and numbers of hyperparameters for each method
   check <- numeric(length = lM)
@@ -41,7 +38,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = FALSE, Nf
       check[m] <- 1
     }
   }
-  if(any(check>0)){stop("Please confirm the numbers and/or names of hyperparameters of the following methods")}
+  if(any(check>0)){stop("Please confirm the numbers and/or names of hyperparameters of the presented methods")}
   
   method <- names(Method)
   
