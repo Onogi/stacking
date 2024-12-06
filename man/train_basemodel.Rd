@@ -17,7 +17,12 @@ train_basemodel(X, Y, Method, core = 1, cross_validation = FALSE, Nfold = 10, nu
   \item{proportion}{A parameter specifying the proportion of samples to be selected when cross_validation is set to FALSE.}
 }
 \details{
-Stacking by this package consists of the following 2 steps. (1) Nfold cross-validation is conducted with each base learner.(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts step (1). Step (2) is conducted by train_metamodel. Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).
+Stacking by this package consists of the following 2 steps. 
+(1) Each base learner is trained. In this step, the training method can be chosen based on the cross_validation parameter.
+If cross_validation is TRUE: The function performs Nfold cross-validation for each base learner.
+If cross_validation is FALSE: The function trains each base learner using random sampling. The number of samples (num_sample) or the proportion of the data (proportion) can be specified to control the selection process.
+(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts step (1). 
+Step (2) is conducted by train_metamodel. Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).
 
 Base learners are specified by Method. For example,\cr
 Method = list(glmnet = data.frame(alpha = 0, lambda = 5), pls = data.frame(ncomp = 10))\cr
