@@ -19,12 +19,15 @@ Stacking by this package consists of the following 2 steps.
 (1) Each base learner is trained. The training method can be chosen based on the cross_validation parameter:
 If cross_validation is TRUE: The function performs Nfold cross-validation for each base learner.
 If cross_validation is FALSE: The function trains each base learner using random sampling. The number of samples (num_sample) or the proportion of the data (proportion) can be specified to control the selection process.
-(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts step (2). 
+(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained.This function conducts step (2).
 Step (1) is conducted by train_basemodel. 
 Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).\cr
 
-In the step (2), there are two options. One is to train the meta learner Nfold times using the predicted values returned by the base models for each fold. The other is to train the meta learner once pooling the predicted values by the base models across folds. TrainEachModel swiches these options.\cr
-
+In the step (2), there are two options. 
+If Cross-Validation is Used.One is to train the meta learner Nfold times using the predicted values returned by the base models for each fold.　The other is to train the meta learner once pooling the predicted values by the base models across folds. 
+If Random Sampling is Used.One option is to train the meta learner num_sample times, using the predicted values returned by the base models for each random sampling.　The other option is to train the meta learner once by combining the predicted values from all random samplings.
+In both cases, the TrainEachFold parameter controls whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
+The use_X parameter controls whether the meta learner is trained with both the original features X and the base model predictions, or with only the base model predictions.
 Meta learners can be chosen from the methods implemented in caret. The choosable methods can be seen at https://topepo.github.io/caret/available-models.html or using names(getModelInfo()) after loading caret.
 }
 \value{
