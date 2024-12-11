@@ -98,7 +98,7 @@ Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
 ##4. pls with ncomp = 5
 \donttest{
 #Training of base learners
-base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 2)
+base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5, num_sample = 5, proportion = 0.8)
 
 #Training of a meta learner
 meta <- train_metamodel(base, which_to_use = 1:4, Metamodel = "lm")
@@ -114,10 +114,15 @@ plot(Y2, result)
 #Training using stacking_train
 stacking_train_result <- stacking_train(X = X1,
                                         Y = Y1,
-                                        Nfold = 5,
                                         Method = Method,
                                         Metamodel = "lm",
-                                        core = 2)
+                                        core = 2,
+                                        cross_validation = TRUE, 
+                                        use_X = FALSE, 
+                                        TrainEachFold = TRUE, 
+                                        Nfold = 5, 
+                                        num_sample = 5, 
+                                        proportion = 0.8)
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
