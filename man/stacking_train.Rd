@@ -103,18 +103,23 @@ Method <- list(glmnet = data.frame(alpha = c(0.5, 0.8), lambda = c(0.1, 1)),
 \donttest{
 stacking_train_result <- stacking_train(X = X1,
                                         Y = Y1,
-                                        Nfold = 5,
                                         Method = Method,
                                         Metamodel = "lm",
-                                        core = 3)
+                                        core = 3,
+                                        cross_validation = TRUE, 
+                                        use_X = FALSE, 
+                                        TrainEachFold = TRUE, 
+                                        Nfold = 5, 
+                                        num_sample = 5, 
+                                        proportion = 0.8)
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
 
 #Training using train_basemodel and train_metamodel
-base <- train_basemodel(X = X1, Y = Y1, Nfold = 5, Method = Method, core = 3)
-meta <- train_metamodel(base, which_to_use = 1:5, Metamodel = "lm")
+base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 3, cross_validation = TRUE, Nfold = 5, num_sample = 5, proportion = 0.8)
+meta <- train_metamodel(base, which_to_use = 1:5, Metamodel = "lm", use_X = FALSE, TrainEachFold = TRUE)
 stacking_train_result <- list(base = base, meta = meta)
 #=>this list should have elements named as base and meta
 
