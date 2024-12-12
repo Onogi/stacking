@@ -63,6 +63,9 @@ stacking_train_result <- stacking_train(X = X1,
                                         num_sample = 5, 
                                         proportion = 0.8)
 
+#####################################################################################################################################
+とりあえずpredictのマニュアルでランダムサンプリングと元の特徴量を含める際のコードを説明部分に追加。問題なければ同文を各マニュアルの該当部分に挿入
+#####################################################################################################################################
 #For random sampling, set cross_validation = FALSE and specify the number of samples and the sampling proportion using num_sample and proportion, respectively.
 #To include the original features X when training the meta-model, set use_X = TRUE.
 #The following code reflects the changes made to the relevant arguments.
