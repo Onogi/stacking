@@ -31,7 +31,7 @@ Another function stacking_train conducts both steps at once by calling these fun
 
 In the step (2), there are six options. 
 If Cross-Validation is Used.One is to train the meta learner Nfold times using the predicted values returned by the base models for each fold.　The other is to train the meta learner once pooling the predicted values by the base models across folds. 
-If Random Sampling is Used.One option is to train the meta learner num_sample times, using the predicted values returned by the base models for each random sampling.　The other option is to train the meta learner once by combining the predicted values from all random samplings.
+If Random Sampling is Used.One option is to train the meta learner num_sample times, using the predicted values returned by the base models for each random sampling.　The other is to train the meta learner once by combining the predicted values from all random samplings.
 In both cases, the TrainEachFold parameter controls whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
 The use_X parameter controls whether the meta learner is trained with both the original features X and the base model predictions, or with only the base model predictions.
 
