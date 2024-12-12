@@ -14,7 +14,7 @@ stacking_predict(newX, stacking_train_result)
 Prediction processes of this package are as follows. First, newX is given to all base models. As a result, each base learner returns Nfold predicted values where Nfold is an argument of stacking_train. Then the predicted values are averaged for each learner. Giving these averaged values as the explanatory variables of the meta model, final predicted values are output.
 }
 \value{
-\item{result}{Vector of predicted values. When TrainEachFold of stacking_train or train_metamodel is TRUE (i.e., stacking_train_result$meta$TrainEachFold is TRUE), the values are the averages of the values predicted from the meta models trained for each cross-validation fold. In the case of classification, the probabilities of each category are returned.}
+\item{result}{Vector of predicted values. When TrainEachFold of stacking_train or train_metamodel is TRUE (i.e., stacking_train_result$meta$TrainEachFold is TRUE), the values are the averages of the values predicted from the meta models trained for each cross-validation fold, and for random sampling, the values are the averages of the values predicted from the meta models trained for each random sampling iteration. In the case of classification, the probabilities of each category are returned.}
 }
 \author{Taichi Nukui, Akio Onogi
 }
