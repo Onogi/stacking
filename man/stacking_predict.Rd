@@ -59,9 +59,7 @@ stacking_train_result <- stacking_train(X = X1,
                                         cross_validation = TRUE, 
                                         use_X = FALSE, 
                                         TrainEachFold = TRUE, 
-                                        Nfold = 5, 
-                                        num_sample = 5, 
-                                        proportion = 0.8)
+                                        Nfold = 5)
 
 #####################################################################################################################################
 とりあえずpredictのマニュアルでランダムサンプリングと元の特徴量を含める際のコードを説明部分に追加。問題なければ同文を各マニュアルの該当部分に挿入
@@ -76,8 +74,7 @@ stacking_train_result <- stacking_train(X = X1,
                                         core = 2,
                                         cross_validation = FALSE, 
                                         use_X = TRUE, 
-                                        TrainEachFold = TRUE, 
-                                        Nfold = 5, 
+                                        TrainEachFold = TRUE,
                                         num_sample = 5, 
                                         proportion = 0.8)
 
@@ -86,7 +83,7 @@ result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
 
 #Training using train_basemodel and train_metamodel
-base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5, num_sample = 5, proportion = 0.8)
+base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5)
 meta <- train_metamodel(base, which_to_use = 1:5, Metamodel = "lm", use_X = FALSE, TrainEachFold = TRUE)
 stacking_train_result <- list(base = base, meta = meta)
 #=>this list should have elements named as base and meta
