@@ -1,7 +1,7 @@
 \name{train_basemodel}
 \alias{train_basemodel}
 \title{Training base models}
-\description{Training base models of stacking
+\description{Training base models of stacking. This function internally calls train_basemodel_core.
 }
 \usage{
 train_basemodel(X, Y, Method, core = 1, cross_validation = FALSE, Nfold = 10, num_sample = 10, proportion = 0.8)
