@@ -14,9 +14,9 @@ stacking_train(X, Y, Method, Metamodel, core = 1, cross_validation = TRUE, use_X
 　\item{core}{Number of cores for parallel processing}
   \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random sampling.}
 　\item{use_X}{A logical indicating whether the meta-learner uses the original features X along with the base model predictions. If TRUE, it uses both X and the predictions; if FALSE, it uses only the predictions.}
-　\item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold/random sampling round or not. If TRUE, the meta learners learns Nfold/num_sample times using the values predicted by the base models at each fold/round. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds/rounds.}
+　\item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold/random sample or not. If TRUE, the meta learners learns Nfold/num_sample times using the values predicted by the base models at each fold/sample. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds/samples.}
   \item{Nfold}{Number of folds for cross-validation.}
-　\item{num_sample}{The number of samples (rounds) of random sampling, applicable when cross_validation is set to FALSE.}
+　\item{num_sample}{The number of samples of random sampling, applicable when cross_validation is set to FALSE.}
   \item{proportion}{A parameter specifying the proportion of samples to be sampled when cross_validation is set to FALSE.}
 }
 \details{
@@ -30,8 +30,8 @@ Steps (1) and (2) are conducted by train_basemodel and train_metamodel, respecti
 Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).\cr
 
 Training of the meta learner can be modified by two arguments, TrainEachFold and use_X.
-TrainEachFold parameter controls whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
-The use_X parameter controls whether the meta learner is trained with both the original features X and the base model predictions, or with only the base model predictions.
+TrainEachFold specifies whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
+use_X specifies whether the meta learner is trained with both the original features X and the base model predictions, or with only the base model predictions.
 
 Base learners are specified by Method. For example,\cr
 Method = list(glmnet = data.frame(alpha = 0, lambda = 5), pls = data.frame(ncomp = 10))\cr
@@ -62,7 +62,7 @@ A list containing the following elements is output.
 \item{meta}{A list output by train_metamodel. See value of train_metamodel for the details}
 }
 \author{
-Taichi Nukui, Akio Onogi
+Taichi Nukui, Tomohiro Ishibashi, Akio Onogi
 }
 \seealso{
 train_basemodel, train_metamodel
@@ -103,13 +103,11 @@ stacking_train_result <- stacking_train(X = X1,
                                         Y = Y1,
                                         Method = Method,
                                         Metamodel = "lm",
-                                        core = 3,
+                                        core = 2,
                                         cross_validation = TRUE, 
                                         use_X = FALSE, 
                                         TrainEachFold = TRUE, 
-                                        Nfold = 5, 
-                                        num_sample = 5, 
-                                        proportion = 0.8)
+                                        Nfold = 5)
 
 #For random sampling, set cross_validation = FALSE and specify the number of samples and the sampling proportion using num_sample and proportion, respectively.
 #To include the original features X when training the meta-model, set use_X = TRUE.
@@ -118,11 +116,10 @@ stacking_train_result <- stacking_train(X = X1,
                                         Y = Y1,
                                         Method = Method,
                                         Metamodel = "lm",
-                                        core = 3,
+                                        core = 2,
                                         cross_validation = FALSE, 
                                         use_X = TRUE, 
                                         TrainEachFold = TRUE, 
-                                        Nfold = 5, 
                                         num_sample = 5, 
                                         proportion = 0.8)
 
@@ -131,7 +128,7 @@ result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
 
 #Training using train_basemodel and train_metamodel
-base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 3, cross_validation = TRUE, Nfold = 5, num_sample = 5, proportion = 0.8)
+base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5)
 meta <- train_metamodel(base, which_to_use = 1:5, Metamodel = "lm", use_X = FALSE, TrainEachFold = TRUE)
 stacking_train_result <- list(base = base, meta = meta)
 #=>this list should have elements named as base and meta
