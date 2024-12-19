@@ -4,24 +4,24 @@
 \description{Training base models of stacking. This function internally calls train_basemodel_core.
 }
 \usage{
-train_basemodel(X, Y, Method, core = 1, cross_validation = FALSE, Nfold = 10, num_sample = 10, proportion = 0.8)
+train_basemodel(X, Y, Method, core = 1, cross_validation = TRUE, Nfold = 10, num_sample = 10, proportion = 0.8)
 }
 \arguments{
   \item{X}{An N x P matrix of explanatory variables where N is the number of samples and P is the number of variables. Column names are required by caret.}
   \item{Y}{A length N Vector of objective variables. Use a factor for classification.}
   \item{Method}{A list specifying base learners. Each element of the list is a data.frame that contains hyperparameter values of base learners. The names of the list elements specifies the base learners and are passed to caret functions. See details and examples}
   \item{core}{Number of cores for parallel processing}
-  \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random selection.}
+  \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random sampling.}
   \item{Nfold}{Number of folds for cross-validation. This cross-validation is required for training.}
-  \item{num_sample}{The number of samples for random selection, applicable when cross_validation is set to FALSE.}
-  \item{proportion}{A parameter specifying the proportion of samples to be selected when cross_validation is set to FALSE.}
+  \item{num_sample}{The number of samples for random sampling, applicable when cross_validation is set to FALSE.}
+  \item{proportion}{A parameter specifying the proportion of samples to be sampled when cross_validation is set to FALSE.}
 }
 \details{
 Stacking by this package consists of the following 2 steps. 
-(1) Each base learner is trained.The training method can be chosen based on the cross_validation parameter.
+(1) Each base learner is trained.The training method can be chosen based on the cross_validation argument.
 If cross_validation is TRUE: The function performs Nfold cross-validation for each base learner.
-If cross_validation is FALSE: The function trains each base learner using random sampling. The number of samples (num_sample) or the proportion of the data (proportion) can be specified to control the selection process.
-(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained. This function conducts step (1). 
+If cross_validation is FALSE: The function trains each base learner using random sampling. The number of samples (num_sample) or the proportion of the data (proportion) can be specified to control the sampling process.
+(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained.
 Step (2) is conducted by train_metamodel. Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).
 
 Base learners are specified by Method. For example,\cr
