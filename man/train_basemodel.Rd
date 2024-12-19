@@ -50,19 +50,19 @@ The base and meta learners can be chosen from the methods implemented in caret. 
 }
 \value{
 A list containing the following elements is output.
-\item{train_result}{A list containing the training results of the base models. The length of this list is the same as Nfold, and each element is a list of which length is the same as the number of base models. These elements are the lists output by train function of caret, but the element "trainingData" is removed to save memory.}
+\item{train_result}{A list containing the training results of the base models. The length of this list is the same as Nfold/num_sample, and each element is a list of which length is the same as the number of base models. These elements are the lists output by train function of caret, but the element "trainingData" is removed to save memory.}
 \item{no_base}{Number of base models.}
-\item{valpr}{Predicted values of base models obtained in cross-validation. Used as explanatory variables for the meta learner.}
-\item{Y.randomised}{Y ans X are randomized when cross-validation. Randomized Y is output to enable evaluation of prediction accuracy}
+\item{valpr}{Predicted values of base models obtained in cross-validation/random sampling. Used as explanatory variables for the meta learner.}
+\item{Y.randomised}{Y ans X are randomized when cross-validation/random sampling. Randomized Y is output to enable evaluation of prediction accuracy}
 \item{Order}{Order in randomization.}
 \item{Type}{Type of task (regression or classification).}
 \item{Nfold}{Number of cross-validation folds.}
-\item{num_sample}{Number of samples for random selection.}
-\item{Training_X}{Randomized or selected training data used in model training.}
-\item{cross_validation}{Specifies whether cross-validation (TRUE) or random selection (FALSE) was used during training.}
+\item{num_sample}{Number of samples in random sampling.}
+\item{Training_X}{Randomized or sampled training data used in model training.}
+\item{cross_validation}{Specifies which cross-validation (TRUE) or random sampling (FALSE) was used during training.}
 }
 \author{
-Taichi Nukui, Akio Onogi
+Taichi Nukui, Tomohiro Ishibashi, Akio Onogi
 }
 \seealso{
 stacking_train, train_metamodel
@@ -99,7 +99,7 @@ Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
 ##4. pls with ncomp = 5
 \donttest{
 #Training of base learners
-base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5, num_sample = 5, proportion = 0.8)
+base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5)
 
 #Training of a meta learner
 meta <- train_metamodel(base, which_to_use = 1:4, Metamodel = "lm")
@@ -120,10 +120,8 @@ stacking_train_result <- stacking_train(X = X1,
                                         core = 2,
                                         cross_validation = TRUE, 
                                         use_X = FALSE, 
-                                        TrainEachFold = TRUE, 
-                                        Nfold = 5, 
-                                        num_sample = 5, 
-                                        proportion = 0.8)
+                                        TrainEachFold = FALSE, 
+                                        Nfold = 5)
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
