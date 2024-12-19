@@ -24,24 +24,22 @@ If cross_validation is FALSE: The function trains each base learner using random
 Steps (1) and (2) are conducted by train_basemodel and train_metamodel, respectively. 
 Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).\cr
 
-In the step (2), there are six options. 
-If Cross-Validation is Used.One is to train the meta learner Nfold times using the predicted values returned by the base models for each fold.　The other is to train the meta learner once pooling the predicted values by the base models across folds. 
-If Random Sampling is Used.One option is to train the meta learner num_sample times, using the predicted values returned by the base models for each random sampling.　The other option is to train the meta learner once by combining the predicted values from all random samplings.
-In both cases, the TrainEachFold parameter controls whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
-The use_X parameter controls whether the meta learner is trained with both the original features X and the base model predictions, or with only the base model predictions.
+Training of the meta learner can be modified by two arguments, TrainEachFold and use_X.
+TrainEachFold specifies whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
+use_X specifies whether the meta learner is trained with both the original features X and the base model predictions, or with only the base model predictions.
 
 Meta learners can be chosen from the methods implemented in caret. The choosable methods can be seen at https://topepo.github.io/caret/available-models.html or using names(getModelInfo()) after loading caret.
 }
 \value{
 A list containing the following elements is output.
-\item{train_result}{A list containing the training results of the meta model, which is the list output by train function of caret. When TrainEachFold is TRUE, the length of list is Nfold because the meta learner is trained Nfold times.}
+\item{train_result}{A list containing the training results of the meta model, which is the list output by train function of caret. When TrainEachFold is TRUE, the length of list is Nfold/num_sample because the meta learner is trained Nfold/num_sample times.}
 \item{which_to_use}{which_to_use given as the argument}
-\item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random selection.}
+\item{cross_validation}{A logical to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random sampling.}
 \item{use_X}{use_X}
 \item{TrainEachFold}{TrainEachFold}
 }
 \author{
-Taichi Nukui, Akio Onogi
+Taichi Nukui, Tomohiro Ishibashi, Akio Onogi
 }
 \seealso{
 stacking_train, train_basemodel
@@ -78,7 +76,7 @@ Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
 ##4. pls with ncomp = 5
 \donttest{
 #Training of base learners
-base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5, num_sample = 5, proportion = 0.8)
+base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5)
 
 #Training of a meta learner
 meta <- train_metamodel(base, which_to_use = 1:4, Metamodel = "lm", use_X = FALSE, TrainEachFold = TRUE)
@@ -100,9 +98,7 @@ stacking_train_result <- stacking_train(X = X1,
                                         cross_validation = TRUE, 
                                         use_X = FALSE, 
                                         TrainEachFold = TRUE, 
-                                        Nfold = 5, 
-                                        num_sample = 5, 
-                                        proportion = 0.8)
+                                        Nfold = 5)
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
