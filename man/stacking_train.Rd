@@ -4,7 +4,7 @@
 \description{Training base and meta learners of stacking (an ensemble learning approach). The base and meta learners can be chosen from supervised methods implemented in caret. This function internally calls train_basemodel and train_metamodel. Packages caret, parallel, snow, and packages for base and meta learners should be installed.
 }
 \usage{
-stacking_train(X, Y, Method, Metamodel, core = 1, cross_validation = FALSE, use_X = FALSE, TrainEachFold = FALSE, Nfold = 10, num_sample = 10, proportion = 0.8)
+stacking_train(X, Y, Method, Metamodel, core = 1, cross_validation = TRUE, use_X = FALSE, TrainEachFold = FALSE, Nfold = 10, num_sample = 10, proportion = 0.8)
 }
 \arguments{
   \item{X}{An N x P matrix of explanatory variables where N is the number of samples and P is the number of variables. Column names are required by caret.}
@@ -12,27 +12,25 @@ stacking_train(X, Y, Method, Metamodel, core = 1, cross_validation = FALSE, use_
 　\item{Method}{A list specifying base learners. Each element of the list is a data.frame that contains hyperparameter values of base learners. The names of the list elements specifies the base learners and are passed to caret functions. See details and examples}
   \item{Metamodel}{A strings specifying the meta learner. This strings is passed to caret.}
 　\item{core}{Number of cores for parallel processing}
-  \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random selection.}
+  \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random sampling.}
 　\item{use_X}{A logical indicating whether the meta-learner uses the original features X along with the base model predictions. If TRUE, it uses both X and the predictions; if FALSE, it uses only the predictions.}
-　\item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold or not. If TRUE, the meta learners learns Nfold times using the values predicted by the base models at each fold. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds.}
-  \item{Nfold}{Number of folds for cross-validation. This cross-validation is required for training.}
-　\item{num_sample}{The number of samples for random selection, applicable when cross_validation is set to FALSE.}
-  \item{proportion}{A parameter specifying the proportion of samples to be selected when cross_validation is set to FALSE.}
+　\item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold/random sampling round or not. If TRUE, the meta learners learns Nfold/num_sample times using the values predicted by the base models at each fold/round. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds/rounds.}
+  \item{Nfold}{Number of folds for cross-validation.}
+　\item{num_sample}{The number of samples (rounds) of random sampling, applicable when cross_validation is set to FALSE.}
+  \item{proportion}{A parameter specifying the proportion of samples to be sampled when cross_validation is set to FALSE.}
 }
 \details{
 Stacking by this package consists of the following 2 steps.
 
-(1) Each base learner is trained. The training method can be chosen based on the cross_validation parameter:
+(1) Each base learner is trained. The training method can be chosen using the cross_validation argument:
 If cross_validation is TRUE: The function performs Nfold cross-validation for each base learner.
-If cross_validation is FALSE: The function trains each base learner using random sampling. The number of samples (num_sample) or the proportion of the data (proportion) can be specified to control the selection process.
-(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained.This function conducts step (2).
-Step (1) is conducted by train_basemodel. 
+If cross_validation is FALSE: The function trains each base learner using random sampling. The number of samples (num_sample) or the proportion of the data (proportion) can be specified to control the sampling process.
+(2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained.
+Steps (1) and (2) are conducted by train_basemodel and train_metamodel, respectively. 
 Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).\cr
 
-In the step (2), there are six options. 
-If Cross-Validation is Used.One is to train the meta learner Nfold times using the predicted values returned by the base models for each fold.　The other is to train the meta learner once pooling the predicted values by the base models across folds. 
-If Random Sampling is Used.One option is to train the meta learner num_sample times, using the predicted values returned by the base models for each random sampling.　The other is to train the meta learner once by combining the predicted values from all random samplings.
-In both cases, the TrainEachFold parameter controls whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
+Training of the meta learner can be modified by two arguments, TrainEachFold and use_X.
+TrainEachFold parameter controls whether the meta learner is trained for each fold or random sample individually, or once by pooling or combining all predicted values.
 The use_X parameter controls whether the meta learner is trained with both the original features X and the base model predictions, or with only the base model predictions.
 
 Base learners are specified by Method. For example,\cr
