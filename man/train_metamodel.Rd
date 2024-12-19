@@ -21,7 +21,7 @@ Stacking by this package consists of the following 2 steps.
 If cross_validation is TRUE: The function performs Nfold cross-validation for each base learner.
 If cross_validation is FALSE: The function trains each base learner using random sampling. The number of samples (num_sample) or the proportion of the data (proportion) can be specified to control the selection process.
 (2) Using the predicted values of each learner as the explanatory variables, the meta learner is trained.
-Step (1) is conducted by train_basemodel. 
+Steps (1) and (2) are conducted by train_basemodel and train_metamodel, respectively. 
 Another function stacking_train conducts both steps at once by calling these functions (train_basemodel and train_metamodel).\cr
 
 In the step (2), there are six options. 
