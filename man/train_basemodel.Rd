@@ -123,6 +123,20 @@ stacking_train_result <- stacking_train(X = X1,
                                         TrainEachFold = FALSE, 
                                         Nfold = 5)
 
+#For random sampling, set cross_validation = FALSE and specify the number of samples and the sampling proportion using num_sample and proportion, respectively.
+#To include the original features X when training the meta-model, set use_X = TRUE.
+#The following code reflects the changes made to the relevant arguments.
+stacking_train_result <- stacking_train(X = X1,
+                                        Y = Y1,
+                                        Method = Method,
+                                        Metamodel = "lm",
+                                        core = 2,
+                                        cross_validation = FALSE, 
+                                        use_X = TRUE, 
+                                        TrainEachFold = TRUE,
+                                        num_sample = 5, 
+                                        proportion = 0.8)
+
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
