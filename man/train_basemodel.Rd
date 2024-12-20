@@ -102,7 +102,7 @@ Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
 base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5)
 
 #Training of a meta learner
-meta <- train_metamodel(base, which_to_use = 1:4, Metamodel = "lm")
+meta <- train_metamodel(X, base, which_to_use = 1:4, Metamodel = "lm")
 
 #Combine both results
 stacking_train_result <- list(base = base, meta = meta)
