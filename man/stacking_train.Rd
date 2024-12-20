@@ -129,7 +129,7 @@ plot(Y2, result)
 
 #Training using train_basemodel and train_metamodel
 base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5)
-meta <- train_metamodel(base, which_to_use = 1:5, Metamodel = "lm", use_X = FALSE, TrainEachFold = TRUE)
+meta <- train_metamodel(X, base, which_to_use = 1:5, Metamodel = "lm", use_X = FALSE, TrainEachFold = TRUE)
 stacking_train_result <- list(base = base, meta = meta)
 #=>this list should have elements named as base and meta
 
