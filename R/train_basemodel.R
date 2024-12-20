@@ -17,6 +17,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = TRUE, Nfo
   X.narm <- X[!is.na(Y), ]
   lY <- length(Y.narm)
   if(length(lY) == 0) stop("Elements of Y are all NA.")
+  which_valid <- which(!is.na(Y))
   
   #Checking the names of methods
   lM <- length(Method)
@@ -141,7 +142,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = TRUE, Nfo
       Order = ORDER,
       Type = Type,
       Nfold = Nfold,
-      Training_X = X.randomised,
+      which_valid = which_valid,
       cross_validation = cross_validation
     )
     
@@ -163,7 +164,6 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = TRUE, Nfo
     
     valpr <- matrix(nrow = sample_rows, ncol = length(L))
     Y_stacked <- matrix(nrow = sample_rows, ncol = 1)
-    Training_X <- matrix(nrow = sample_rows, ncol = ncol(X.narm))
     colnames(valpr) <- 1:length(L)
     
     for (iteration in 1:num_sample) {
@@ -201,8 +201,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = TRUE, Nfo
           valpr[start_row:end_row, j] <- predict(train_result[[iteration]][[j]], x.test)
         }
       }
-      Y_stacked[start_row:end_row, ] <- y.test
-      Training_X[start_row:end_row, ] <- x.test  
+      Y_stacked[start_row:end_row, ] <- y.test  
     }
     
     # Output training results
@@ -214,7 +213,7 @@ train_basemodel <- function(X, Y, Method, core = 1, cross_validation = TRUE, Nfo
       Order = ORDER,
       Type = Type,
       num_sample = num_sample,
-      Training_X = Training_X,
+      which_valid = which_valid,
       cross_validation = cross_validation
     )
   }
