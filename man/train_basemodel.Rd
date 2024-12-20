@@ -58,7 +58,7 @@ A list containing the following elements is output.
 \item{Type}{Type of task (regression or classification).}
 \item{Nfold}{Number of cross-validation folds.}
 \item{num_sample}{Number of samples in random sampling.}
-\item{Training_X}{Randomized or sampled training data used in model training.}
+\item{which_valid}{Indices of Y without NA values.}
 \item{cross_validation}{Specifies which cross-validation (TRUE) or random sampling (FALSE) was used during training.}
 }
 \author{
