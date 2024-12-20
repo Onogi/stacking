@@ -5,9 +5,10 @@
 Training a meta model of stacking
 }
 \usage{
-train_metamodel(basemodel_train_result, which_to_use, Metamodel, use_X = FALSE, TrainEachFold = FALSE)
+train_metamodel(X, basemodel_train_result, which_to_use, Metamodel, use_X = FALSE, TrainEachFold = FALSE)
 }
 \arguments{
+  \item{X}{An N x P matrix of explanatory variables where N is the number of samples and P is the number of variables. Column names are required by caret.}
   \item{basemodel_train_result}{The list output by train_basemodel}
   \item{which_to_use}{A vector of integers between 1 and L where L is the number of base models. These integers specify the base models used for training the meta model.}
   \item{Metamodel}{A strings specifying the meta learner}
