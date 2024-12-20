@@ -43,7 +43,7 @@ train_metamodel <- function(X, basemodel_train_result, which_to_use, Metamodel, 
         metamodel <- as.list(numeric(nfold))
         for (fold in 1:nfold) {
           test <- xsoeji[, fold]
-          x_data <- cbind(valpr[test, ], basemodel_train_result$Training_X[test, ])
+          x_data <- cbind(valpr[test, ], Training_X[test, ])
           if(basemodel_train_result$Type == "Classification"){
             colnames(x_data)[(ncol(valpr) + 1):ncol(x_data)] <- as.character(1:(ncol(x_data) - ncol(valpr)))
           } else {
@@ -55,7 +55,7 @@ train_metamodel <- function(X, basemodel_train_result, which_to_use, Metamodel, 
                                      method = Metamodel)
         }
       } else {
-        x_data <- cbind(valpr, basemodel_train_result$Training_X)
+        x_data <- cbind(valpr, Training_X)
         if(basemodel_train_result$Type == "Classification"){
           colnames(x_data)[(ncol(valpr) + 1):ncol(x_data)] <- as.character(1:(ncol(x_data) - ncol(valpr)))
         } else {
