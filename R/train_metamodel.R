@@ -29,7 +29,7 @@ train_metamodel <- function(X, basemodel_train_result, which_to_use, Metamodel, 
     # Training meta models
     if (use_X) {  
       X.narm <- X[basemodel_train_result$which_valid, ]
-      Training_X　<- X.narm[basemodel_train_result$Order, ]
+      Training_X <- X.narm[basemodel_train_result$Order, ]
       
       if (TrainEachFold) {
         ly <- length(basemodel_train_result$Y.randomised)
@@ -98,7 +98,7 @@ train_metamodel <- function(X, basemodel_train_result, which_to_use, Metamodel, 
     chunk_size <- nrow(basemodel_train_result$valpr)/num_sample
     
     if (use_X) {
-      X.narm <- X[basemodel_train_result$which_valid,　]
+      X.narm <- X[basemodel_train_result$which_valid, ]
       
       if (TrainEachFold) {
         metamodel <- as.list(numeric(num_sample))
@@ -107,7 +107,7 @@ train_metamodel <- function(X, basemodel_train_result, which_to_use, Metamodel, 
           end_row <- start_row + chunk_size - 1
           valpr_piece <- valpr[start_row:end_row, ]
           Y.randomised <- basemodel_train_result$Y.randomised[start_row:end_row, ]
-          X.randomised <-  X.narm[-basemodel_train_result$Order[[iteration]],　]
+          X.randomised <-  X.narm[-basemodel_train_result$Order[[iteration]], ]
           feature_aggregation <- cbind(valpr_piece, X.randomised)
           if(basemodel_train_result$Type == "Classification"){
             colnames(feature_aggregation)[(ncol(valpr_piece) + 1):ncol(feature_aggregation)] <- as.character(1:(ncol(feature_aggregation) - ncol(valpr_piece)))
@@ -119,7 +119,7 @@ train_metamodel <- function(X, basemodel_train_result, which_to_use, Metamodel, 
       }else{
         Training_X_list <- list()
         for (iteration in 1:num_sample) {
-          X.randomised <- X.narm[-basemodel_train_result$Order[[iteration]],　]
+          X.randomised <- X.narm[-basemodel_train_result$Order[[iteration]], ]
           Training_X_list[[iteration]] <- X.randomised
         }
         Training_X <- do.call(rbind, Training_X_list)
