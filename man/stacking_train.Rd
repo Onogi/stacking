@@ -9,14 +9,14 @@ stacking_train(X, Y, Method, Metamodel, core = 1, cross_validation = TRUE, use_X
 \arguments{
   \item{X}{An N x P matrix of explanatory variables where N is the number of samples and P is the number of variables. Column names are required by caret.}
   \item{Y}{A length N Vector of objective variables. Use a factor for classification.}
-　\item{Method}{A list specifying base learners. Each element of the list is a data.frame that contains hyperparameter values of base learners. The names of the list elements specifies the base learners and are passed to caret functions. See details and examples}
+  \item{Method}{A list specifying base learners. Each element of the list is a data.frame that contains hyperparameter values of base learners. The names of the list elements specifies the base learners and are passed to caret functions. See details and examples}
   \item{Metamodel}{A strings specifying the meta learner. This strings is passed to caret.}
-　\item{core}{Number of cores for parallel processing}
+  \item{core}{Number of cores for parallel processing}
   \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random sampling.}
-　\item{use_X}{A logical indicating whether the meta-learner uses the original features X along with the base model predictions. If TRUE, it uses both X and the predictions; if FALSE, it uses only the predictions.}
-　\item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold/random sample or not. If TRUE, the meta learners learns Nfold/num_sample times using the values predicted by the base models at each fold/sample. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds/samples.}
+  \item{use_X}{A logical indicating whether the meta-learner uses the original features X along with the base model predictions. If TRUE, it uses both X and the predictions; if FALSE, it uses only the predictions.}
+  \item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold/random sample or not. If TRUE, the meta learners learns Nfold/num_sample times using the values predicted by the base models at each fold/sample. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds/samples.}
   \item{Nfold}{Number of folds for cross-validation.}
-　\item{num_sample}{The number of samples of random sampling, applicable when cross_validation is set to FALSE.}
+  \item{num_sample}{The number of samples of random sampling, applicable when cross_validation is set to FALSE.}
   \item{proportion}{A parameter specifying the proportion of samples to be sampled when cross_validation is set to FALSE.}
 }
 \details{
