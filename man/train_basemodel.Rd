@@ -12,7 +12,7 @@ train_basemodel(X, Y, Method, core = 1, cross_validation = TRUE, Nfold = 10, num
   \item{Method}{A list specifying base learners. Each element of the list is a data.frame that contains hyperparameter values of base learners. The names of the list elements specifies the base learners and are passed to caret functions. See details and examples}
   \item{core}{Number of cores for parallel processing}
   \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random sampling.}
-  \item{Nfold}{Number of folds for cross-validation. This cross-validation is required for training.}
+  \item{Nfold}{Number of folds for cross-validation. Required when cross_validation is TRUE.}
   \item{num_sample}{The number of samples for random sampling, applicable when cross_validation is set to FALSE.}
   \item{proportion}{A parameter specifying the proportion of samples to be sampled when cross_validation is set to FALSE.}
 }
@@ -53,8 +53,8 @@ A list containing the following elements is output.
 \item{train_result}{A list containing the training results of the base models. The length of this list is the same as Nfold/num_sample, and each element is a list of which length is the same as the number of base models. These elements are the lists output by train function of caret, but the element "trainingData" is removed to save memory.}
 \item{no_base}{Number of base models.}
 \item{valpr}{Predicted values of base models obtained in cross-validation/random sampling. Used as explanatory variables for the meta learner.}
-\item{Y.randomised}{Y ans X are randomized when cross-validation/random sampling. Randomized Y is output to enable evaluation of prediction accuracy}
-\item{Order}{Order in randomization.}
+\item{Y.randomised}{Y of the test sets of cross-validation/random sampling. Used as the response variable for the meta learner.}
+\item{Order}{Indices of Y used in cross-validation/random sampling. The indices were those of Y without NA values.}
 \item{Type}{Type of task (regression or classification).}
 \item{Nfold}{Number of cross-validation folds.}
 \item{num_sample}{Number of samples in random sampling.}
@@ -106,7 +106,7 @@ meta <- train_metamodel(X, base, which_to_use = 1:4, Metamodel = "lm")
 
 #Combine both results
 stacking_train_result <- list(base = base, meta = meta)
-#=>this list should have elements named as base and meta
+#=>The list should have elements named as base and meta to be used in stacking_predict
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
@@ -133,7 +133,7 @@ stacking_train_result <- stacking_train(X = X1,
                                         core = 2,
                                         cross_validation = FALSE, 
                                         use_X = TRUE, 
-                                        TrainEachFold = TRUE,
+                                        TrainEachFold = FALSE,
                                         num_sample = 5, 
                                         proportion = 0.8)
 
