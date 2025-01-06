@@ -84,7 +84,7 @@ meta <- train_metamodel(X, base, which_to_use = 1:4, Metamodel = "lm", use_X = F
 
 #Combine both results
 stacking_train_result <- list(base = base, meta = meta)
-#=>this list should have elements named as base and meta
+#=>The list should have elements named as base and meta to be used in stacking_predict
 
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
