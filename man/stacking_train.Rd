@@ -15,7 +15,7 @@ stacking_train(X, Y, Method, Metamodel, core = 1, cross_validation = TRUE, use_X
   \item{cross_validation}{A parameter to specify whether to perform cross-validation. Set to TRUE to enable cross-validation or to FALSE to perform random sampling.}
   \item{use_X}{A logical indicating whether the meta-learner uses the original features X along with the base model predictions. If TRUE, it uses both X and the predictions; if FALSE, it uses only the predictions.}
   \item{TrainEachFold}{A logical indicating whether the meta learner learns using the predicted values of the base models at each cross-validation fold/random sample or not. If TRUE, the meta learners learns Nfold/num_sample times using the values predicted by the base models at each fold/sample. If FALSE, the meta learner learns once by pooling the predicted values of the base models of all folds/samples.}
-  \item{Nfold}{Number of folds for cross-validation.}
+  \item{Nfold}{Number of folds for cross-validation. Required when cross_validation is TRUE.}
   \item{num_sample}{The number of samples of random sampling, applicable when cross_validation is set to FALSE.}
   \item{proportion}{A parameter specifying the proportion of samples to be sampled when cross_validation is set to FALSE.}
 }
