@@ -111,11 +111,12 @@ stacking_train_result <- stacking_train(X = X1,
 
 #For random sampling, set cross_validation = FALSE and specify the number of samples and the sampling proportion using num_sample and proportion, respectively.
 #To include the original features X when training the meta-model, set use_X = TRUE.
+#When use_X is TRUE, simple linear regressions cannot be used as the meta learner because of rank deficient.
 #The following code reflects the changes made to the relevant arguments.
 stacking_train_result <- stacking_train(X = X1,
                                         Y = Y1,
                                         Method = Method,
-                                        Metamodel = "lm",
+                                        Metamodel = "glmnet",
                                         core = 2,
                                         cross_validation = FALSE, 
                                         use_X = TRUE, 
