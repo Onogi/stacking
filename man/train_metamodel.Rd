@@ -75,7 +75,7 @@ Method <- list(glmnet = data.frame(alpha = c(0, 0.5, 1), lambda = rep(NA, 3)),
 ##2. glmnet with alpha = 0.5 and lambda tuned
 ##3. glmnet with alpha = 1 and lambda tuned
 ##4. pls with ncomp = 5
-\donttest{
+
 #Training of base learners
 base <- train_basemodel(X = X1, Y = Y1, Method = Method, core = 2, cross_validation = TRUE, Nfold = 5)
 
@@ -119,5 +119,5 @@ stacking_train_result <- stacking_train(X = X1,
 #Prediction
 result <- stacking_predict(newX = X2, stacking_train_result)
 plot(Y2, result)
-}
+
 }
